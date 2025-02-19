@@ -6,7 +6,7 @@ import java.util.*;
 import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
 
-//Lexy Wright
+// Brooklyn Leonard
 
 public class Main {
 
