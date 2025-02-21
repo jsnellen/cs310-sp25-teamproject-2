@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package edu.jsu.mcis.cs310.tas_sp25;
 import java.time.LocalDateTime;
 
@@ -14,45 +10,45 @@ public class Punch {
     private Integer id;
     
     //The ID of the time clock
-    private int terminalID;
+    private int terminalid;
     
     //Employee badge info
     private Badge badge;
     
     //Original timestamp
-    private LocalDateTime originalTimestamp;
+    private LocalDateTime originaltimestamp;
     
     //Adjusted timestamp (initially null)
     private LocalDateTime adjustedTimestamp;
      
     //The type of punch: clock in, clock out, ect.
-    private EventType punchType;
+    private EventType punchtype;
     
-    private PunchAdjustmentType adjustmentType;
+    private PunchAdjustmentType adjustmenttype;
     
     
     //Constructor for new Punch objects
-    public Punch(int terminalID, Badge badge, EventType punchType){
-        this.terminalID = terminalID;
+    public Punch(int terminalid, Badge badge, EventType punchType){
+        this.terminalid = terminalid;
         this.badge = badge;
-        this.punchType = punchType;
+        this.punchtype = punchType;
         //when the punch occurred in real time
-        this.originalTimestamp = LocalDateTime.now();
+        this.originaltimestamp = LocalDateTime.now();
         //no adjustment is made yet
         this.adjustedTimestamp = null;
         this.id = null;
-        this.adjustmentType = PunchAdjustmentType.NONE;
+        this.adjustmenttype = PunchAdjustmentType.NONE;
     }
     
     public Punch(int id, int terminalID, Badge badge, LocalDateTime originalTimeStamp,
     EventType punchType){
         this.id = id;
-        this.terminalID = terminalID;
+        this.terminalid = terminalID;
         this.badge = badge;
-        this.punchType = punchType;
-        this.originalTimestamp = originalTimestamp;
+        this.punchtype = punchType;
+        this.originaltimestamp = originaltimestamp;
         this.adjustedTimestamp = null;
-        this.adjustmentType = PunchAdjustmentType.NONE;
+        this.adjustmenttype = PunchAdjustmentType.NONE;
 
     }
     
@@ -62,16 +58,16 @@ public class Punch {
         return id;
     }
     
-    public int getTerminalID() {
-        return terminalID;
+    public int getTerminalid() {
+        return terminalid;
     }
 
     public Badge getBadge() {
         return badge;
     }
 
-    public LocalDateTime getOriginalTimestamp() {
-        return originalTimestamp;
+    public LocalDateTime getOriginaltimestamp() {
+        return originaltimestamp;
     }
 
     public LocalDateTime getAdjustedTimestamp() {
@@ -82,29 +78,29 @@ public class Punch {
         this.adjustedTimestamp = adjustedTimestamp;
     }
 
-    public EventType getPunchType() {
-        return punchType;
+    public EventType getPunchtype() {
+        return punchtype;
     }
 
     public PunchAdjustmentType getAdjustmentType(){
-        return adjustmentType;
+        return adjustmenttype;
     }
     
     public void setAdjustmentType(PunchAdjustmentType adjustmentType){
-        this.adjustmentType = adjustmentType;
+        this.adjustmenttype = adjustmentType;
     }
     
     public void printOriginal(){
-    System.out.println("Punch ID: " + id + ", Terminal ID: " + terminalID + ", Badge: "
-        + badge + ", Punch Type: " + punchType + ", Original Timestamp: " 
-        + originalTimestamp + ", Adjustment Type: " + adjustmentType);
+    System.out.println("Punch ID: " + id + ", Terminal ID: " + terminalid + ", Badge: "
+        + badge + ", Punch Type: " + punchtype + ", Original Timestamp: " 
+        + originaltimestamp + ", Adjustment Type: " + adjustmenttype);
     }
     
     public void printAdjusted(){
         if(adjustedTimestamp != null){
-            System.out.println("Punch ID: " + id + ", Terminal ID: " + terminalID + ", Badge: "
-            + badge + ", Punch Type: " + punchType + ", Adjusted Timestamp: " 
-            + adjustedTimestamp + ", Adjustment Type: " + adjustmentType);
+            System.out.println("Punch ID: " + id + ", Terminal ID: " + terminalid + ", Badge: "
+            + badge + ", Punch Type: " + punchtype + ", Adjusted Timestamp: " 
+            + adjustedTimestamp + ", Adjustment Type: " + adjustmenttype);
         }else{
             System.out.println("No adjustment for Punch ID: " + id);
         }
