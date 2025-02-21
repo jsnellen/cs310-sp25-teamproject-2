@@ -4,10 +4,6 @@
  */
 package edu.jsu.mcis.cs310.tas_sp25.dao;
 
-/**
- *
- * @author alexi
- */
 public class PunchDAO {
     
 }
