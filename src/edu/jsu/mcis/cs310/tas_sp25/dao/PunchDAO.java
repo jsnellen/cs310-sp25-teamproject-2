@@ -18,6 +18,7 @@ public class PunchDAO {
         this.daoFactory = daoFactory;
     }
     
+    
     //Find a Punch by its ID
     public Punch find(int id){
         String query = "SELECT terminalid, badgeid, timestamp, punchtype FROM event WHERE id = ?";
