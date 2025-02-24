@@ -40,7 +40,7 @@ public class Punch {
         this.adjustmenttype = PunchAdjustmentType.NONE;
     }
     
-    public Punch(int id, int terminalID, Badge badge, LocalDateTime originalTimeStamp,
+    public Punch(int id, int terminalID, Badge badge, LocalDateTime originaltimestamp,
     EventType punchType){
         this.id = id;
         this.terminalid = terminalID;
