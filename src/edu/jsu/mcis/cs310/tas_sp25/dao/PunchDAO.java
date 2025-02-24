@@ -20,7 +20,7 @@ public class PunchDAO {
     
     //Find a Punch by its ID
     public Punch find(int id){
-        String query = "Select terminalid, badgeid, timestamp, punchtype from event where id = ?";
+        String query = "SELECT terminalid, badgeid, timestamp, punchtype FROM event WHERE id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(query)){
             stmt.setInt(1, id); //Setting the ID
