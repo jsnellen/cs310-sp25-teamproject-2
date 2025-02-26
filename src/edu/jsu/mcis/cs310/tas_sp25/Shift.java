@@ -58,6 +58,8 @@ public class Shift {
 }
 */
 
+
+
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.Duration;
@@ -104,15 +106,24 @@ public class Shift {
 
     @Override
     public String toString() {
-        return String.format("%s: %s - %s (%d minutes); Lunch: %s - %s (%d minutes)", 
-            shiftType,
-            startTime.format(TIME_FORMATTER), 
-            stopTime.format(TIME_FORMATTER), 
-            totalMinutes,
-            lunchStart.format(TIME_FORMATTER), 
-            lunchStop.format(TIME_FORMATTER), 
-            lunchMinutes
-        );
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append(shiftType)
+          .append(": ")
+          .append(startTime.format(TIME_FORMATTER))
+          .append(" - ")
+          .append(stopTime.format(TIME_FORMATTER))
+          .append(" (")
+          .append(totalMinutes)
+          .append(" minutes); Lunch: ")
+          .append(lunchStart.format(TIME_FORMATTER))
+          .append(" - ")
+          .append(lunchStop.format(TIME_FORMATTER))
+          .append(" (")
+          .append(lunchMinutes)
+          .append(" minutes)");
+        
+        return sb.toString();
     }
 
     // Getters (if needed)

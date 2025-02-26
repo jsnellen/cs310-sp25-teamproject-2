@@ -12,61 +12,117 @@ package edu.jsu.mcis.cs310.tas_sp25.dao;
  * @author brooklynleonard
  */
 import edu.jsu.mcis.cs310.tas_sp25.*;
-
 import java.sql.*;
 import java.util.HashMap;
 
 public class ShiftDAO {
 
-    private Connection conn;
+    private static final String QUERY_FIND_BY_ID = "SELECT * FROM shift WHERE id = ?";
+    private static final String QUERY_FIND_BY_BADGE = "SELECT shiftid FROM employee WHERE badgeid = ?";
 
-    // Constructor
-    public ShiftDAO(Connection conn) {
-        this.conn = conn;
+    private final DAOFactory daoFactory;
+
+    ShiftDAO(DAOFactory daoFactory) {
+        this.daoFactory = daoFactory;
     }
 
-    // Finding shift by ID
     public Shift find(int id) {
         Shift shift = null;
-        String query = "SELECT * FROM shift WHERE id = ?";
 
-        try (PreparedStatement ps = conn.prepareStatement(query)) {
-            ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    HashMap<String, String> shiftData = new HashMap<>();
-                    shiftData.put("id", String.valueOf(rs.getInt("id")));
-                    shiftData.put("start", rs.getString("start"));
-                    shiftData.put("stop", rs.getString("stop"));
-                    shiftData.put("lunchstart", rs.getString("lunchstart"));
-                    shiftData.put("lunchstop", rs.getString("lunchstop"));
-                    
-                    // Create Shift object
-                    shift = new Shift(shiftData);
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            Connection conn = daoFactory.getConnection();
+
+            if (conn.isValid(0)) {
+                ps = conn.prepareStatement(QUERY_FIND_BY_ID);
+                ps.setInt(1, id);
+
+                boolean hasResults = ps.execute();
+
+                if (hasResults) {
+                    rs = ps.getResultSet();
+
+                    while (rs.next()) {
+                        HashMap<String, String> shiftData = new HashMap<>();
+                        
+                        shiftData.put("start", rs.getString("start"));
+                        shiftData.put("stop", rs.getString("stop"));
+                        shiftData.put("lunchstart", rs.getString("lunchstart"));
+                        shiftData.put("lunchstop", rs.getString("lunchstop"));
+                        
+                        shift = new Shift(shiftData);
+                    }
                 }
             }
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DAOException(e.getMessage());
+
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.getMessage());
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.getMessage());
+                }
+            }
         }
 
         return shift;
     }
 
-    // Finding the shift by employee Badge
     public Shift find(Badge badge) {
         Shift shift = null;
-        String query = "SELECT shiftid FROM employee WHERE badgeid = ?";
+        
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
-        try (PreparedStatement ps = conn.prepareStatement(query)) {
-            ps.setString(1, badge.getId());
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    int shiftId = rs.getInt("shiftid");
-                    shift = find(shiftId); 
+        try {
+            Connection conn = daoFactory.getConnection();
+
+            if (conn.isValid(0)) {
+                ps = conn.prepareStatement(QUERY_FIND_BY_BADGE);
+                ps.setString(1, badge.getId());
+
+                boolean hasResults = ps.execute();
+
+                if (hasResults) {
+                    rs = ps.getResultSet();
+
+                    while (rs.next()) {
+                        int shiftId = rs.getInt("shiftid");
+                        shift = find(shiftId);
+                    }
                 }
             }
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DAOException(e.getMessage());
+
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.getMessage());
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.getMessage());
+                }
+            }
         }
 
         return shift;
