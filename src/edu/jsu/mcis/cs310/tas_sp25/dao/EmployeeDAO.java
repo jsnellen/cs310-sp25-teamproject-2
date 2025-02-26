@@ -2,13 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package edu.jsu.mcis.cs310.tas_sp24.dao;
+package edu.jsu.mcis.cs310.tas_sp25.dao;
 
-import edu.jsu.mcis.cs310.tas_sp24.Badge;
-import edu.jsu.mcis.cs310.tas_sp24.Department;
-import edu.jsu.mcis.cs310.tas_sp24.Employee;
-import edu.jsu.mcis.cs310.tas_sp24.EmployeeType;
-import edu.jsu.mcis.cs310.tas_sp24.Shift;
+import edu.jsu.mcis.cs310.tas_sp25.Badge;
+import edu.jsu.mcis.cs310.tas_sp25.Department;
+import edu.jsu.mcis.cs310.tas_sp25.Employee;
+import edu.jsu.mcis.cs310.tas_sp25.EmployeeType;
+import edu.jsu.mcis.cs310.tas_sp25.Shift;
 
 import java.sql.*;
 
