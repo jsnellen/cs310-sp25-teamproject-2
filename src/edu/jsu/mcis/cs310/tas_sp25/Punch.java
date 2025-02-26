@@ -90,19 +90,19 @@ public class Punch {
         this.adjustmenttype = adjustmentType;
     }
     
-    public void printOriginal(){
-    System.out.println("Punch ID: " + id + ", Terminal ID: " + terminalid + ", Badge: "
+    public String printOriginal(){
+    return ("Punch ID: " + id + ", Terminal ID: " + terminalid + ", Badge: "
         + badge + ", Punch Type: " + punchtype + ", Original Timestamp: " 
         + originaltimestamp + ", Adjustment Type: " + adjustmenttype);
     }
     
-    public void printAdjusted(){
+    public String printAdjusted(){
         if(adjustedTimestamp != null){
-            System.out.println("Punch ID: " + id + ", Terminal ID: " + terminalid + ", Badge: "
+            return("Punch ID: " + id + ", Terminal ID: " + terminalid + ", Badge: "
             + badge + ", Punch Type: " + punchtype + ", Adjusted Timestamp: " 
             + adjustedTimestamp + ", Adjustment Type: " + adjustmenttype);
         }else{
-            System.out.println("No adjustment for Punch ID: " + id);
+            return("No adjustment for Punch ID: " + id);
         }
-   }
+    }
 }
