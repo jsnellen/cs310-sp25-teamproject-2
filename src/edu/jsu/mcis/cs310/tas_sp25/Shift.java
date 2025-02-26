@@ -8,9 +8,8 @@ package edu.jsu.mcis.cs310.tas_sp25;
  *
  * @author brooklynleonard
  */
-import java.time.LocalDateTime;
-import java.util.Map;
 
+/*
 public class Shift {
     private String startTime;
     private String stopTime;
@@ -55,5 +54,93 @@ public class Shift {
     public String toString() {
         return "Shift [Start Time: " + startTime + ", Stop Time: " + stopTime + 
                ", Lunch Duration: " + lunchDuration + " min, Shift Duration: " + shiftDuration + " min]";
+    }
+}
+*/
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.Duration;
+import java.util.Map;
+
+public class Shift {
+    private LocalTime startTime;
+    private LocalTime stopTime;
+    private LocalTime lunchStart;
+    private LocalTime lunchStop;
+    private int totalMinutes;
+    private int lunchMinutes;
+    private String shiftType;
+
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+
+    public Shift(Map<String, String> shiftData) {
+        // Parse times
+        this.startTime = LocalTime.parse(shiftData.get("start"), TIME_FORMATTER);
+        this.stopTime = LocalTime.parse(shiftData.get("stop"), TIME_FORMATTER);
+        this.lunchStart = LocalTime.parse(shiftData.get("lunchstart"), TIME_FORMATTER);
+        this.lunchStop = LocalTime.parse(shiftData.get("lunchstop"), TIME_FORMATTER);
+
+        // Calculate total shift minutes
+        this.totalMinutes = (int) Duration.between(startTime, stopTime).toMinutes();
+
+        // Calculate lunch minutes
+        this.lunchMinutes = (int) Duration.between(lunchStart, lunchStop).toMinutes();
+
+        // Determine shift type
+        this.shiftType = determineShiftType();
+    }
+
+    private String determineShiftType() {
+        if (startTime.equals(LocalTime.parse("07:00")) && lunchStart.equals(LocalTime.parse("11:30"))) {
+            return "Shift 1 Early Lunch";
+        } else if (startTime.equals(LocalTime.parse("07:00")) && lunchStart.equals(LocalTime.parse("12:00"))) {
+            return "Shift 1";
+        } else if (startTime.equals(LocalTime.parse("12:00"))) {
+            return "Shift 2";
+        }
+        return "Unknown Shift";
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s: %s - %s (%d minutes); Lunch: %s - %s (%d minutes)", 
+            shiftType,
+            startTime.format(TIME_FORMATTER), 
+            stopTime.format(TIME_FORMATTER), 
+            totalMinutes,
+            lunchStart.format(TIME_FORMATTER), 
+            lunchStop.format(TIME_FORMATTER), 
+            lunchMinutes
+        );
+    }
+
+    // Getters (if needed)
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalTime getStopTime() {
+        return stopTime;
+    }
+
+    public LocalTime getLunchStart() {
+        return lunchStart;
+    }
+
+    public LocalTime getLunchStop() {
+        return lunchStop;
+    }
+
+    public int getTotalMinutes() {
+        return totalMinutes;
+    }
+
+    public int getLunchMinutes() {
+        return lunchMinutes;
+    }
+
+    public String getShiftType() {
+        return shiftType;
     }
 }
