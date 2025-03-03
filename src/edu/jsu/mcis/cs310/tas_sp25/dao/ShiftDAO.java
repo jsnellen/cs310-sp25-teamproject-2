@@ -15,10 +15,11 @@ import edu.jsu.mcis.cs310.tas_sp25.*;
 import java.sql.*;
 import java.util.HashMap;
 
+
 public class ShiftDAO {
 
-    private static final String QUERY_FIND_BY_ID = "SELECT * FROM shift WHERE id = ?";
-    private static final String QUERY_FIND_BY_BADGE = "SELECT shiftid FROM employee WHERE badgeid = ?";
+    private static final String QUERY_FIND = "SELECT * FROM shift WHERE id = ?";
+    private static final String QUERY_FIND_BY_BADGE = "SELECT * FROM shift WHERE id = (SELECT shiftid FROM badge WHERE id = ?)";
 
     private final DAOFactory daoFactory;
 
@@ -36,7 +37,7 @@ public class ShiftDAO {
             Connection conn = daoFactory.getConnection();
 
             if (conn.isValid(0)) {
-                ps = conn.prepareStatement(QUERY_FIND_BY_ID);
+                ps = conn.prepareStatement(QUERY_FIND);
                 ps.setInt(1, id);
 
                 boolean hasResults = ps.execute();
@@ -45,13 +46,15 @@ public class ShiftDAO {
                     rs = ps.getResultSet();
 
                     while (rs.next()) {
+                        // Create a HashMap to store the shift data
                         HashMap<String, String> shiftData = new HashMap<>();
                         
-                        shiftData.put("start", rs.getString("start"));
-                        shiftData.put("stop", rs.getString("stop"));
+                        shiftData.put("startshift", rs.getString("shiftstart"));
+                        shiftData.put("stop", rs.getString("shiftstop"));
                         shiftData.put("lunchstart", rs.getString("lunchstart"));
                         shiftData.put("lunchstop", rs.getString("lunchstop"));
                         
+                        // Create a new Shift object using the shiftData HashMap
                         shift = new Shift(shiftData);
                     }
                 }
@@ -82,7 +85,7 @@ public class ShiftDAO {
 
     public Shift find(Badge badge) {
         Shift shift = null;
-        
+
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -128,3 +131,4 @@ public class ShiftDAO {
         return shift;
     }
 }
+

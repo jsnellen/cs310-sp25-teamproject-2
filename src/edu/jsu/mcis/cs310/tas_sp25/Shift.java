@@ -66,7 +66,7 @@ import java.time.Duration;
 import java.util.Map;
 
 public class Shift {
-    private LocalTime startTime;
+    private LocalTime shiftstart;
     private LocalTime stopTime;
     private LocalTime lunchStart;
     private LocalTime lunchStop;
@@ -78,13 +78,13 @@ public class Shift {
 
     public Shift(Map<String, String> shiftData) {
         // Parse times
-        this.startTime = LocalTime.parse(shiftData.get("start"), TIME_FORMATTER);
+        this.shiftstart = LocalTime.parse(shiftData.get("start"), TIME_FORMATTER);
         this.stopTime = LocalTime.parse(shiftData.get("stop"), TIME_FORMATTER);
         this.lunchStart = LocalTime.parse(shiftData.get("lunchstart"), TIME_FORMATTER);
         this.lunchStop = LocalTime.parse(shiftData.get("lunchstop"), TIME_FORMATTER);
 
         // Calculate total shift minutes
-        this.totalMinutes = (int) Duration.between(startTime, stopTime).toMinutes();
+        this.totalMinutes = (int) Duration.between(shiftstart, stopTime).toMinutes();
 
         // Calculate lunch minutes
         this.lunchMinutes = (int) Duration.between(lunchStart, lunchStop).toMinutes();
@@ -94,11 +94,11 @@ public class Shift {
     }
 
     private String determineShiftType() {
-        if (startTime.equals(LocalTime.parse("07:00")) && lunchStart.equals(LocalTime.parse("11:30"))) {
+        if (shiftstart.equals(LocalTime.parse("07:00")) && lunchStart.equals(LocalTime.parse("11:30"))) {
             return "Shift 1 Early Lunch";
-        } else if (startTime.equals(LocalTime.parse("07:00")) && lunchStart.equals(LocalTime.parse("12:00"))) {
+        } else if (shiftstart.equals(LocalTime.parse("07:00")) && lunchStart.equals(LocalTime.parse("12:00"))) {
             return "Shift 1";
-        } else if (startTime.equals(LocalTime.parse("12:00"))) {
+        } else if (shiftstart.equals(LocalTime.parse("12:00"))) {
             return "Shift 2";
         }
         return "Unknown Shift";
@@ -110,7 +110,7 @@ public class Shift {
         
         sb.append(shiftType)
           .append(": ")
-          .append(startTime.format(TIME_FORMATTER))
+          .append(shiftstart.format(TIME_FORMATTER))
           .append(" - ")
           .append(stopTime.format(TIME_FORMATTER))
           .append(" (")
@@ -128,7 +128,7 @@ public class Shift {
 
     // Getters (if needed)
     public LocalTime getStartTime() {
-        return startTime;
+        return shiftstart;
     }
 
     public LocalTime getStopTime() {
