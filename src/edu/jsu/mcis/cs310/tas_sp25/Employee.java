@@ -76,10 +76,15 @@ public class Employee {
     
     //Override toString() method to match
     @Override
-    public String toString(){
-        String middleInitial = (middlename != null && !middlename.isEmpty()) ? middlename.substring(0, 1) + "." : "";
-        return String.format("ID #%d: %s, %s %s (%s), Type: %s, Department: %s, Active: %s",
-                id, lastname, firstname, middleInitial, badge.getId(), employeeType, department.getDescription(), active.toLocalDate().toString());
+    public String toString() {
+
+        StringBuilder s = new StringBuilder();
+
+        s.append('#').append(id).append(' ');
+        s.append('(').append(firstname).append(')');
+
+        return s.toString();
+
     }
     
 }
