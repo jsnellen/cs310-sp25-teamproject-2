@@ -3,47 +3,104 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package edu.jsu.mcis.cs310.tas_sp25.dao;
+
 import edu.jsu.mcis.cs310.tas_sp25.*;
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+import java.util.ArrayList;
 
 public class PunchDAO {
-    private final Connection connection; //Database connection object
-    private final DAOFactory daoFactory; //DAOFactory for BadgeDAO
-    
-    //Constructor initializing the DAO with an existing database
-    public PunchDAO(Connection connection, DAOFactory daoFactory){
+    private final Connection connection; // Database connection object
+    private final DAOFactory daoFactory; // DAOFactory for BadgeDAO
+
+    // Constructor initializing the DAO with an existing database
+    public PunchDAO(Connection connection, DAOFactory daoFactory) {
         this.connection = connection;
         this.daoFactory = daoFactory;
     }
-    
-    
-    //Find a Punch by its ID
-    public Punch find(int id){
+
+    // Find a Punch by its ID
+    public Punch find(int id) {
         String query = "SELECT terminalid, badgeid, timestamp, punchtype FROM event WHERE id = ?";
-        
-        try (PreparedStatement stmt = connection.prepareStatement(query)){
-            stmt.setInt(1, id); //Setting the ID
-            ResultSet rs = stmt.executeQuery(); //Executing
-            
-            if (rs.next()){ //If there is an ID to match
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, id); // Setting the ID
+            ResultSet rs = stmt.executeQuery(); // Executing
+
+            if (rs.next()) { // If there is an ID to match
                 int terminalId = rs.getInt("terminalid");
                 String badgeID = rs.getString("badgeid");
                 LocalDateTime timestamp = rs.getTimestamp("timestamp").toLocalDateTime();
                 EventType punchType = EventType.values()[rs.getInt("punchtype")];
-                
-                
-                //Supposed to retrieve the Badge that goes with the PunchID
+
+                // Retrieve the Badge that corresponds to the Punch ID
                 BadgeDAO badgeDAO = new BadgeDAO(daoFactory);
                 Badge badge = badgeDAO.find(badgeID);
-                
-                //Should return the Punch and get the data
-                return new Punch(id, terminalId, badge, timestamp, punchType); 
+
+                // Return the Punch with the retrieved data
+                return new Punch(id, terminalId, badge, timestamp, punchType);
             }
-        } catch (SQLException e){
-            e.printStackTrace(); //Should handle the SQL Exceptions
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle SQL exceptions
         }
         return null;
+    }
+
+    // Adding the retrieve a list of Punch objects for a specific Badge on a specific day
+    public ArrayList<Punch> list(Badge badge, LocalDate date) {
+        ArrayList<Punch> punches = new ArrayList<>();
+
+        // Query to retrieve punches for the specified day, ordered by timestamp
+        String query = """
+                SELECT id, terminalid, badgeid, timestamp, punchtype FROM event
+                WHERE badgeid = ? AND DATE(timestamp) = ?
+                ORDER BY timestamp
+                """;
+
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, badge.getId());
+            ps.setString(2, date.toString());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    int terminalId = rs.getInt("terminalid");
+                    LocalDateTime timestamp = rs.getTimestamp("timestamp").toLocalDateTime();
+                    EventType punchType = EventType.values()[rs.getInt("punchtype")];
+
+                    punches.add(new Punch(id, terminalId, badge, timestamp, punchType));
+                }
+            }
+
+            // Query to retrieve the first punch from the next day
+            String nextDayQuery = """
+                    SELECT id, terminalid, badgeid, timestamp, punchtype FROM event
+                    WHERE badgeid = ? AND DATE(timestamp) = ?
+                    ORDER BY timestamp LIMIT 1
+                    """;
+
+            try (PreparedStatement psNext = connection.prepareStatement(nextDayQuery)) {
+                psNext.setString(1, badge.getId());
+                psNext.setString(2, date.plusDays(1).toString());
+
+                try (ResultSet rsNext = psNext.executeQuery()) {
+                    if (rsNext.next()) {
+                        int id = rsNext.getInt("id");
+                        int terminalId = rsNext.getInt("terminalid");
+                        LocalDateTime timestamp = rsNext.getTimestamp("timestamp").toLocalDateTime();
+                        EventType punchType = EventType.values()[rsNext.getInt("punchtype")];
+
+                        if (punchType == EventType.CLOCK_OUT || punchType == EventType.TIME_OUT) {
+                            punches.add(new Punch(id, terminalId, badge, timestamp, punchType));
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return punches;
     }
 }
