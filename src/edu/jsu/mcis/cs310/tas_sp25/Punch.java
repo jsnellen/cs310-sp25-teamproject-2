@@ -51,6 +51,10 @@ public class Punch {
         this.adjustmenttype = PunchAdjustmentType.NONE;
 
     }
+    //adjust method
+    public void adjust(Shift s){
+        
+    }
     
     //Getters and setters
 
@@ -90,19 +94,33 @@ public class Punch {
         this.adjustmenttype = adjustmentType;
     }
     
-    public String printOriginal(){
-    return ("Punch ID: " + id + ", Terminal ID: " + terminalid + ", Badge: "
-        + badge + ", Punch Type: " + punchtype + ", Original Timestamp: " 
-        + originaltimestamp + ", Adjustment Type: " + adjustmenttype);
+    @Override
+    public String toString(){
+        
+    StringBuilder s = new StringBuilder();
+    
+    s.append("Punch ID: ").append(id).append(" ");
+    s.append("Terminal ID: ").append(terminalid).append(", ");
+    s.append("Badge: ").append(badge).append(", ");
+    s.append("Punch Type: ").append(punchtype).append(", ");
+    s.append("Original Timestamp: ").append(originaltimestamp).append(")");
+    
+    return s.toString();
     }
     
     public String printAdjusted(){
+        
+        StringBuilder s = new StringBuilder();
+        
         if(adjustedTimestamp != null){
-            return("Punch ID: " + id + ", Terminal ID: " + terminalid + ", Badge: "
-            + badge + ", Punch Type: " + punchtype + ", Adjusted Timestamp: " 
-            + adjustedTimestamp + ", Adjustment Type: " + adjustmenttype);
+           s.append("Punch ID: ").append(id).append(" ");
+           s.append("Terminal ID: ").append(terminalid).append(", ");
+           s.append("Badge: ").append(badge).append(", ");
+           s.append("Adjusted Timestamp: ").append(adjustedTimestamp).append(", ");
+           s.append("Adjustment Type: ").append(adjustmenttype).append(")");
         }else{
-            return("No adjustment for Punch ID: " + id);
+            s.append("No adjustment for Punch ID: ").append(id);
         }
+        return s.toString();
     }
 }
