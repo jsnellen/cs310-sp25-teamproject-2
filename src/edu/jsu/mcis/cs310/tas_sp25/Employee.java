@@ -77,12 +77,13 @@ public class Employee {
     //Override toString() method to match
     @Override
     public String toString() {
-
         StringBuilder s = new StringBuilder();
-
-        s.append('#').append(id).append(' ');
-        s.append('(').append(firstname).append(')');
-
+   
+        s.append("ID #").append(getId()).append(": ");
+        s.append(getLastname()).append(", ").append(getFirstname()).append(' ').append(getMiddlename());
+        s.append(" (#").append(badge.getId()).append("), Type: ").append(getEmployeeType());
+        s.append(", Department: ").append(getDepartment().getDescription());
+        
         return s.toString();
 
     }
