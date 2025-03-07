@@ -46,7 +46,47 @@ public class PunchDAO {
         }
         return null;
     }
+    
+    public int create(Punch punch) {
+        int result = 0;
 
+        try {
+            Connection conn = daoFactory.getConnection();
+            String query = "INSERT INTO event (terminalid, badgeid, timestamp, punchtype) VALUES (?, ?, ?, ?)";
+
+            // Retrieve employee (if applicable)
+            EmployeeDAO employeeDAO = daoFactory.getEmployeeDAO();
+            Employee employee = employeeDAO.find(punch.getBadge());
+
+              // Validate terminal ID if employee exists
+            if (employee != null) {
+                Department employeeDepartment = employee.getDepartment();
+                if (punch.getTerminalid() != employeeDepartment.getTerminalid()) {
+                    return 0; // Terminal ID mismatch, reject punch
+                }
+            }
+
+            // Create and execute statement
+            try (PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setInt(1, punch.getTerminalid());
+                ps.setString(2, punch.getBadge().getId());
+                ps.setTimestamp(3, Timestamp.valueOf(punch.getOriginaltimestamp()));
+                ps.setInt(4, punch.getPunchtype().ordinal()); // Store as integer
+
+                ps.executeUpdate();
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    result = rs.getInt(1); // Retrieve generated ID
+                }
+            }
+
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
     // Adding the retrieve a list of Punch objects for a specific Badge on a specific day
     public ArrayList<Punch> list(Badge badge, LocalDate date) {
         ArrayList<Punch> punches = new ArrayList<>();
