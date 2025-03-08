@@ -74,9 +74,11 @@ public class PunchDAO {
                 ps.setInt(4, punch.getPunchtype().ordinal()); // Store as integer
 
                 ps.executeUpdate();
+                
                 ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    result = rs.getInt(1); // Retrieve generated ID
+                    if (rs.next()) {
+                        result = rs.getInt(1);// Retrieve generated ID
+                    
                 }
             }
 
