@@ -57,8 +57,8 @@ public class Punch {
     //adjust method
     public void adjust(Shift s){
         //extract shift start, stop, lunch times, grace period, dock penalty, and interval
-        LocalTime shiftStart = s.getShiftStart();
-        LocalTime shiftStop = s.getShiftStop();
+        LocalTime shiftStart = s.getStartTime();
+        LocalTime shiftStop = s.getStopTime();
         LocalTime lunchStart = s.getLunchStart();
         LocalTime lunchStop = s.getLunchStop();
         Duration gracePeriod = s.getGracePeriod();
