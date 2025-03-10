@@ -26,9 +26,9 @@ public class DAOUtility {
         for (Punch p : dailypunchlist) {
             HashMap<String, String> punchData = new HashMap<>();
             punchData.put("id", String.valueOf(p.getId()));
-            punchData.put("badgeid", String.valueOf(p.getBadgeId()));
-            punchData.put("terminalid", String.valueOf(p.getTerminalId()));
-            punchData.put("punchtype", p.getPunchType().toString());
+            punchData.put("badgeid", String.valueOf(p.getBadge()));
+            punchData.put("terminalid", String.valueOf(p.getTerminalid()));
+            punchData.put("punchtype", p.getPunchtype().toString());
             punchData.put("adjustmenttype", p.getAdjustmentType().toString());
             punchData.put("originaltimestamp", p.printOriginal());
             punchData.put("adjustedtimestamp", p.printAdjusted());
