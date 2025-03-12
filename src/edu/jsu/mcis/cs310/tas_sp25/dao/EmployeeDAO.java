@@ -167,7 +167,7 @@ public class EmployeeDAO {
 
             if (rs != null) {
                 try {
-                    rs.close();
+                   rs.close();
                 } catch (SQLException e) {
                     throw new DAOException(e.getMessage());
                 }
