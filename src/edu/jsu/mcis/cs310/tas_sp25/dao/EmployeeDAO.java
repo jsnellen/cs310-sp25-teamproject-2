@@ -11,7 +11,7 @@ import java.util.HashMap;
 /**
  * Data Access Object for the employee section of the database
  * 
- * @author Dillon Firman
+ * @author Dillon
  */
 
 public class EmployeeDAO {
@@ -186,13 +186,9 @@ public class EmployeeDAO {
             if (rs != null) {
                 
                 try {
-<<<<<<< HEAD
-                   rs.close();
-=======
                     
                     rs.close();
                     
->>>>>>> c52df9cbadab19949d62a3203f5c550f9a2cf987
                 } catch (SQLException e) {
                     
                     throw new DAOException(e.getMessage());
