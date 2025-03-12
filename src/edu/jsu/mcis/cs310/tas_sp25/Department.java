@@ -30,7 +30,15 @@ public class Department {
 
     @Override
     public String toString() {
-        return "Department{" + "id=" + id + ", description=" + description + ", terminalid=" + terminalid + '}';
+
+        StringBuilder s = new StringBuilder();
+        
+        s.append("Department ID: ").append(id).append(" ");
+        s.append("(").append(description).append(", ");
+        s.append("Terminal ID: ").append(terminalid).append(")");
+
+        return s.toString();
+
     }
-    
+
 }

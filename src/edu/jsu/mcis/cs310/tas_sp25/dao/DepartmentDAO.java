@@ -52,7 +52,7 @@ public class DepartmentDAO {
      * @param id The id of the department.
      * @return A Department object if found; null otherwise.
      */
-    public Department findById(int id) {
+    public Department find(int id) {
         String query = "SELECT * FROM department WHERE id = ?";
         try (Connection conn = daoFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
