@@ -42,8 +42,12 @@ public final class DAOFactory {
         return new PunchDAO(this.getConnection(), this);
     }
     
-    public EmployeeDAO getEmployeeDAO(){
-        return new EmployeeDAO(this);
+    public EmployeeDAO getEmployeeDAO() {
+        return new EmployeeDAO(this, getShiftDAO(), getDepartmentDAO(), getBadgeDAO());
+    }
+    
+    public DepartmentDAO getDepartmentDAO(){
+        return new DepartmentDAO(this);
     }
      
 

@@ -1,54 +1,63 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package edu.jsu.mcis.cs310.tas_sp25.dao;
 
-import edu.jsu.mcis.cs310.tas_sp25.Badge;
-import edu.jsu.mcis.cs310.tas_sp25.Department;
-import edu.jsu.mcis.cs310.tas_sp25.Employee;
-import edu.jsu.mcis.cs310.tas_sp25.EmployeeType;
-import edu.jsu.mcis.cs310.tas_sp25.Shift;
+import edu.jsu.mcis.cs310.tas_sp25.*;
 
 import java.sql.*;
 
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+
 /**
- *
- * @author TIMI
+ * Data Access Object for the employee section of the database
+ * 
+ * @author Dillon Firman
  */
+
 public class EmployeeDAO {
-    // creates DAO Factory object
-    private final DAOFactory daoFactory;
-    
-    private static final String QUERY_FIND = "SELECT * FROM employee WHERE id = ?";
-    private static final String QUERY_FIND_BADGE = "SELECT * FROM employee WHERE badgeid = ?";
 
-    EmployeeDAO(DAOFactory daoFactory) {
-
-        this.daoFactory = daoFactory;
-    }
-    // method for finds parts in the database for Employee
     /**
-     * A find method to find Employee by the ID
-     * @param id the ID of Employee
-     * @return Employee
+     * Query that finds employee data by employee id
      */
-    public Employee find(int id){
+    private static final String QUERY_FIND = "SELECT * FROM employee WHERE id = ?";
+    /**
+     * Query that finds employee data by badge id
+     */
+    private static final String QUERY_FIND2 = "SELECT * FROM employee WHERE badgeid = ?";
+    
+    /**
+     * DAO fields
+     */
+    private final DAOFactory daoFactory;
+    private final ShiftDAO shiftDAO;
+    private final DepartmentDAO departmentDAO;
+    private final BadgeDAO badgeDAO;
+    
+    EmployeeDAO(DAOFactory daoFactory, ShiftDAO shiftDAO, DepartmentDAO departmentDAO, BadgeDAO badgeDAO) {
         
-        Employee employee = null;
+        this.daoFactory = daoFactory;
+        this.departmentDAO = departmentDAO;
+        this.shiftDAO = shiftDAO;
+        this.badgeDAO = badgeDAO;
+    }
 
+    /**
+     * Finds the employee data based on the employee id
+     * @param id the employee id
+     * @return the employee data object
+     */
+    public Employee find(Integer id) {
+
+        Employee employee = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
-
+            
             Connection conn = daoFactory.getConnection();
 
             if (conn.isValid(0)) {
-
+                
                 ps = conn.prepareStatement(QUERY_FIND);
                 ps.setInt(1, id);
 
@@ -57,133 +66,148 @@ public class EmployeeDAO {
                 if (hasresults) {
 
                     rs = ps.getResultSet();
-                      // gives information to the Employee
+
                     while (rs.next()) {
-                        BadgeDAO badgedao = new BadgeDAO(daoFactory);
-                        ShiftDAO shiftdao = new ShiftDAO(daoFactory);
-                        DepartmentDAO departmentdao = new DepartmentDAO(daoFactory);
-                        String firstname = rs.getString("firstname");
-                        String lastname = rs.getString("lastname");
-                        String middlename = rs.getString("middlename");
-                        LocalDateTime active = rs.getTimestamp("active").toLocalDateTime();
-                        EmployeeType employeeType = EmployeeType.values()[rs.getInt("employeeTypeID")];
-                        Badge badge = badgedao.find(rs.getString("badgeid"));
-                        Department department = departmentdao.find(rs.getInt("departmentid"));
-                        Shift shift = shiftdao.find(badge);
+
+                        HashMap<String, Object> employeeParams = new HashMap<>();
+
+                        Badge badge = badgeDAO.find(rs.getString("badgeid"));
+                        String[] fullName = badge.getDescription().split(",\\s+");
+
+                        String lastName = fullName[0];
+                        String firstName = fullName[1].split(" ")[0];
+                        String middleName = fullName[1].split(" ")[1];
+
+                        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                        LocalDateTime active = LocalDateTime.parse(rs.getString("active"), dtf);
+                        Department department = departmentDAO.find(rs.getInt("departmentid"));
+                        Shift shift = shiftDAO.find(rs.getInt("id"));
+
+                        int employeeTypeNum = rs.getInt("employeetypeid");
+                        EmployeeType employeeType = null;
                         
-                        employee = new Employee(id,firstname,middlename,lastname,active,badge,department,shift,employeeType);
+                        // simplify
+                        switch(employeeTypeNum) {
+                            
+                            case 0 -> employeeType = EmployeeType.PART_TIME;
 
+                            case 1 -> employeeType = EmployeeType.FULL_TIME;
+
+                            default -> throw new IllegalArgumentException("Invalid employeeType id: " + employeeType);
+                        }
+
+                        employeeParams.put("id", id);
+                        employeeParams.put("firstName", firstName);
+                        employeeParams.put("middleName", middleName);
+                        employeeParams.put("lastName", lastName);
+                        employeeParams.put("active", active);
+                        employeeParams.put("badge", badge);
+                        employeeParams.put("department", department);
+                        employeeParams.put("shift", shift);
+                        employeeParams.put("employeeType", employeeType);
+
+                        employee = new Employee(employeeParams);
                     }
-
                 }
-
             }
-
-        }
-
-       
-        catch (SQLException e) {
-
+            
+        } catch(SQLException e) {
+            
             throw new DAOException(e.getMessage());
-
+            
         } finally {
 
             if (rs != null) {
+                
                 try {
+                    
                     rs.close();
+                    
                 } catch (SQLException e) {
+                    
                     throw new DAOException(e.getMessage());
                 }
             }
+            
             if (ps != null) {
+                
                 try {
+                    
                     ps.close();
+                    
                 } catch (SQLException e) {
+                    
                     throw new DAOException(e.getMessage());
                 }
             }
-
         }
         
-         return employee;
-}
-     // find method
+        return employee;
+    }
+    
     /**
-     * A find method using Badge ID to find Employee
-     * @param badge the badge of the Employee
-     * @return Employee
+     * Finds the employee data based on the employee's badge id
+     * @param badge the employee's badge id
+     * @return the employee data object
      */
-    public Employee find(Badge badge){
-        
+    public Employee find(Badge badge) {
+
         Employee employee = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
-
+            
             Connection conn = daoFactory.getConnection();
 
             if (conn.isValid(0)) {
-
-                ps = conn.prepareStatement(QUERY_FIND_BADGE);
+                
+                ps = conn.prepareStatement(QUERY_FIND2);
                 ps.setString(1, badge.getId());
-                  
 
                 boolean hasresults = ps.execute();
 
                 if (hasresults) {
-
                     rs = ps.getResultSet();
 
                     while (rs.next()) {
-                        
-                        ShiftDAO shiftdao = new ShiftDAO(daoFactory);
-                        DepartmentDAO departmentdao = new DepartmentDAO(daoFactory);
-                        int id = rs.getInt("id");
-                        String firstname = rs.getString("firstname");
-                        String lastname = rs.getString("lastname");
-                        String middlename = rs.getString("middlename");
-                        LocalDateTime active = rs.getTimestamp("active").toLocalDateTime();
-                        EmployeeType employeeType = EmployeeType.values()[rs.getInt("employeeTypeID")];
-                        Department department = departmentdao.find(rs.getInt("departmentid"));
-                        Shift shift = shiftdao.find(rs.getInt("shiftid"));
-                        employee = new Employee(id,firstname,middlename,lastname,active,badge,department,shift,employeeType);
 
+                        employee = find(rs.getInt("id"));
                     }
-                        
                 }
-
             }
-
-        }
-
-        
-         // throw and exception messages
-        catch (SQLException e) {
+            
+        } catch (SQLException e) {
 
             throw new DAOException(e.getMessage());
 
         } finally {
 
             if (rs != null) {
+                
                 try {
+                    
                     rs.close();
+                    
                 } catch (SQLException e) {
+                    
                     throw new DAOException(e.getMessage());
                 }
             }
+            
             if (ps != null) {
+                
                 try {
+                    
                     ps.close();
+                    
                 } catch (SQLException e) {
+                    
                     throw new DAOException(e.getMessage());
                 }
             }
-
         }
-        
-         return employee;
-         
+
+        return employee;
     }
-    
 }
