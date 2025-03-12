@@ -74,7 +74,7 @@ public class Shift {
     private int lunchMinutes;
     private String shiftType;
 
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     public Shift(Map<String, String> shiftData) {
         // Parse times
@@ -94,11 +94,11 @@ public class Shift {
     }
 
     private String determineShiftType() {
-        if (shiftstart.equals(LocalTime.parse("07:00")) && lunchStart.equals(LocalTime.parse("11:30"))) {
+        if (shiftstart.equals(LocalTime.parse("07:00", TIME_FORMATTER)) && lunchStart.equals(LocalTime.parse("11:30", TIME_FORMATTER))) {
             return "Shift 1 Early Lunch";
-        } else if (shiftstart.equals(LocalTime.parse("07:00")) && lunchStart.equals(LocalTime.parse("12:00"))) {
+        } else if (shiftstart.equals(LocalTime.parse("07:00", TIME_FORMATTER)) && lunchStart.equals(LocalTime.parse("12:00", TIME_FORMATTER))) {
             return "Shift 1";
-        } else if (shiftstart.equals(LocalTime.parse("12:00"))) {
+        } else if (shiftstart.equals(LocalTime.parse("12:00", TIME_FORMATTER))) {
             return "Shift 2";
         }
         return "Unknown Shift";

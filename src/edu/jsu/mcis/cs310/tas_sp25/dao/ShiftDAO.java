@@ -48,8 +48,7 @@ public class ShiftDAO {
                     while (rs.next()) {
                         // Create a HashMap to store the shift data
                         HashMap<String, String> shiftData = new HashMap<>();
-                        
-                        shiftData.put("startshift", rs.getString("shiftstart"));
+                        shiftData.put("start", rs.getString("shiftstart")); // Corrected key
                         shiftData.put("stop", rs.getString("shiftstop"));
                         shiftData.put("lunchstart", rs.getString("lunchstart"));
                         shiftData.put("lunchstop", rs.getString("lunchstop"));
