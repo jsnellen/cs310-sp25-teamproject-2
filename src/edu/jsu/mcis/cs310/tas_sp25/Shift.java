@@ -73,6 +73,10 @@ public class Shift {
     private int totalMinutes;
     private int lunchMinutes;
     private String shiftType;
+    private Duration graceperiod;
+    private Duration dockpenalty;
+    private Duration roundinterval;
+
 
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 
@@ -153,5 +157,17 @@ public class Shift {
 
     public String getShiftType() {
         return shiftType;
+    }
+
+    public Duration getGracePeriod() {
+        return graceperiod;
+    }
+
+    public Duration getDockPenalty() {
+        return dockpenalty;
+    }
+
+    public Duration getRoundInterval() {
+        return roundinterval;
     }
 }
