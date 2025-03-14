@@ -61,7 +61,7 @@ public class DAOUtility {
             else if (punch.getPunchtype() == EventType.CLOCK_OUT) {
                 // End of a work period: if we have a valid "clock in" then calculate the duration.
                 if (inPunch != null) {
-                    long minutes = Duration.between(inPunch.getAdjustedtimestamp(), punch.getAdjustedtimestamp()).toMinutes();
+                    long minutes = Duration.between(inPunch.getAdjustedTimestamp(), punch.getAdjustedTimestamp()).toMinutes();
                     totalMinutes += (int) minutes;
                     inPunch = null;
                 }
@@ -73,8 +73,8 @@ public class DAOUtility {
         }
         
         // Apply lunch deduction if the total minutes meet or exceed the lunch threshold.
-        if (totalMinutes >= shift.getLunchThreshold()) {
-            totalMinutes -= shift.getLunchDuration();
+        if (totalMinutes >= shift.getTotalMinutes()) {
+            totalMinutes -= shift.getLunchMinutes();
         }
         
         return totalMinutes;
