@@ -55,9 +55,7 @@ public class Punch {
         this.adjustmenttype = PunchAdjustmentType.NONE;
     }
     
-    public void adjust(Shift s) {
-        DateTimeFormatter f = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
-        
+    public void adjust(Shift s) {        
         LocalTime shiftStart = s.getStartTime();
         LocalTime shiftStop = s.getStopTime();
         LocalTime lunchStart = s.getLunchStart();
@@ -74,7 +72,7 @@ public class Punch {
         adjustmenttype = PunchAdjustmentType.NONE;
 
         if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-            //TODO
+            adjustedTimestamp = timestamp.withSecond(0).withNano(0);
             return;
         }
 
