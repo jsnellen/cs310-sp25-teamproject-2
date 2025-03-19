@@ -78,5 +78,8 @@ public class DAOUtility {
         }
         
         return totalMinutes;
+        
+        // Static Utility MEthod for Absenteeism
+        
     }
 }

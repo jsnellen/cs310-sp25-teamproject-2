@@ -13,11 +13,13 @@ import java.util.ArrayList;
 public class PunchDAO {
     private final Connection connection; // Database connection object
     private final DAOFactory daoFactory; // DAOFactory for BadgeDAO
+    private final BadgeDAO badgeDAO;
 
     // Constructor initializing the DAO with an existing database
-    public PunchDAO(Connection connection, DAOFactory daoFactory) {
-        this.connection = connection;
+    public PunchDAO(DAOFactory daoFactory) {
         this.daoFactory = daoFactory;
+        this.connection = daoFactory.getConnection();
+        this.badgeDAO = daoFactory.getBadgeDAO();
     }
 
     // Find a Punch by its ID
@@ -35,7 +37,6 @@ public class PunchDAO {
                 EventType punchType = EventType.values()[rs.getInt("punchtype")];
 
                 // Retrieve the Badge that corresponds to the Punch ID
-                BadgeDAO badgeDAO = new BadgeDAO(daoFactory);
                 Badge badge = badgeDAO.find(badgeID);
 
                 // Return the Punch with the retrieved data
@@ -99,7 +100,7 @@ public class PunchDAO {
 
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, badge.getId());
-            ps.setString(2, date.toString());
+            ps.setDate(2, java.sql.Date.valueOf(date));
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -111,33 +112,20 @@ public class PunchDAO {
                     punches.add(new Punch(id, terminalId, badge, timestamp, punchType));
                 }
             }
-
-            // Query to retrieve the first punch from the next day
-            String nextDayQuery = """
-                    SELECT id, terminalid, badgeid, timestamp, punchtype FROM event
-                    WHERE badgeid = ? AND DATE(timestamp) = ?
-                    ORDER BY timestamp LIMIT 1
-                    """;
-
-            try (PreparedStatement psNext = connection.prepareStatement(nextDayQuery)) {
-                psNext.setString(1, badge.getId());
-                psNext.setString(2, date.plusDays(1).toString());
-
-                try (ResultSet rsNext = psNext.executeQuery()) {
-                    if (rsNext.next()) {
-                        int id = rsNext.getInt("id");
-                        int terminalId = rsNext.getInt("terminalid");
-                        LocalDateTime timestamp = rsNext.getTimestamp("timestamp").toLocalDateTime();
-                        EventType punchType = EventType.values()[rsNext.getInt("punchtype")];
-
-                        if (punchType == EventType.CLOCK_OUT || punchType == EventType.TIME_OUT) {
-                            punches.add(new Punch(id, terminalId, badge, timestamp, punchType));
-                        }
-                    }
-                }
-            }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+
+        return punches;
+    }
+
+    public ArrayList<Punch> list(Badge badge, LocalDate begin, LocalDate end) {
+        ArrayList<Punch> punches = new ArrayList<>();
+
+        // Iterate through the date range
+        for (LocalDate date = begin; !date.isAfter(end); date = date.plusDays(1)) {
+            // Reuse the existing list(Badge badge, LocalDate date) method
+            punches.addAll(list(badge, date));
         }
 
         return punches;
