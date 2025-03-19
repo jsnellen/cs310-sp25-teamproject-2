@@ -9,10 +9,6 @@ package edu.jsu.mcis.cs310.tas_sp25;
  * @author brooklynleonard
  */
 
-
-
-
-
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.Duration;
@@ -31,7 +27,7 @@ public class Shift {
     private Duration roundinterval;
 
 
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm[:ss]");
 
     public Shift(Map<String, String> shiftData) {
         // Parse times
@@ -48,6 +44,14 @@ public class Shift {
 
         // Determine shift type
         this.shiftType = determineShiftType();
+    }
+    
+    //ensures that the string is in the correct format
+    private LocalTime parseTime(String timeString){
+        if(timeString.length() == 5){
+            timeString += ".00";
+        }
+        return LocalTime.parse(timeString, TIME_FORMATTER);
     }
 
     private String determineShiftType() {
