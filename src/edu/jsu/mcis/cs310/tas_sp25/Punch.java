@@ -1,5 +1,8 @@
 package edu.jsu.mcis.cs310.tas_sp25;
+import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 /*
  * Purpose: represent a timestamp when an employee clocks in/out 
@@ -52,10 +55,7 @@ public class Punch {
 
     }
     //adjust method
-    public void adjust(Shift s){
-        
-    }
-    
+   
     //Getters and setters
 
     public Integer getId() {
@@ -94,8 +94,7 @@ public class Punch {
         this.adjustmenttype = adjustmentType;
     }
     
-    @Override
-    public String toString(){
+    public String printOriginal(){
         
     StringBuilder s = new StringBuilder();
     

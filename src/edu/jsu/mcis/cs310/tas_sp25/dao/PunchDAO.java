@@ -46,7 +46,7 @@ public class PunchDAO {
         }
         return null;
     }
-
+    
     // Adding the retrieve a list of Punch objects for a specific Badge on a specific day
     public ArrayList<Punch> list(Badge badge, LocalDate date) {
         ArrayList<Punch> punches = new ArrayList<>();
