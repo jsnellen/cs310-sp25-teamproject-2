@@ -54,10 +54,6 @@ public class Punch {
         this.adjustedTimestamp = null;
         this.adjustmenttype = PunchAdjustmentType.NONE;
     }
-<<<<<<< HEAD
-    //adjust method
-   
-=======
     
     public void adjust(Shift s) {        
         LocalTime shiftStart = s.getStartTime();
@@ -124,7 +120,6 @@ public class Punch {
         adjustmenttype = PunchAdjustmentType.INTERVAL_ROUND;
     }
 
->>>>>>> 7b200626e1a2abd9a8fe6e835b58b4ad4ba6fded
     //Getters and setters
 
     public Integer getId() {
