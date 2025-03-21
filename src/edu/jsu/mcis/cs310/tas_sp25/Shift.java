@@ -9,57 +9,6 @@ package edu.jsu.mcis.cs310.tas_sp25;
  * @author brooklynleonard
  */
 
-/*
-public class Shift {
-    private String startTime;
-    private String stopTime;
-    private int lunchDuration;  // in minutes
-    private int shiftDuration;  // in minutes
-
-    public Shift(Map<String, String> shiftData) {
-        if (shiftData == null) {
-            throw new IllegalArgumentException("Shift data cannot be null.");
-        }
-
-        this.startTime = shiftData.getOrDefault("startTime", "00:00");
-        this.stopTime = shiftData.getOrDefault("stopTime", "00:00");
-        
-        // Convert values from String to int with error handling
-        try {
-            this.lunchDuration = Integer.parseInt(shiftData.getOrDefault("lunchDuration", "0"));
-            this.shiftDuration = Integer.parseInt(shiftData.getOrDefault("shiftDuration", "0"));
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid numeric value in shift data.");
-        }
-    }
-
-    // Getters for accessing the data
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public String getStopTime() {
-        return stopTime;
-    }
-
-    public int getLunchDuration() {
-        return lunchDuration;
-    }
-
-    public int getShiftDuration() {
-        return shiftDuration;
-    }
-
-    @Override
-    public String toString() {
-        return "Shift [Start Time: " + startTime + ", Stop Time: " + stopTime + 
-               ", Lunch Duration: " + lunchDuration + " min, Shift Duration: " + shiftDuration + " min]";
-    }
-}
-*/
-
-
-
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.Duration;
@@ -73,8 +22,12 @@ public class Shift {
     private int totalMinutes;
     private int lunchMinutes;
     private String shiftType;
+    private Duration graceperiod;
+    private Duration dockpenalty;
+    private Duration roundinterval;
 
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm[:ss]");
 
     public Shift(Map<String, String> shiftData) {
         // Parse times
@@ -92,13 +45,21 @@ public class Shift {
         // Determine shift type
         this.shiftType = determineShiftType();
     }
+    
+    //ensures that the string is in the correct format
+    private LocalTime parseTime(String timeString){
+        if(timeString.length() == 5){
+            timeString += ".00";
+        }
+        return LocalTime.parse(timeString, TIME_FORMATTER);
+    }
 
     private String determineShiftType() {
-        if (shiftstart.equals(LocalTime.parse("07:00")) && lunchStart.equals(LocalTime.parse("11:30"))) {
+        if (shiftstart.equals(LocalTime.parse("07:00", TIME_FORMATTER)) && lunchStart.equals(LocalTime.parse("11:30", TIME_FORMATTER))) {
             return "Shift 1 Early Lunch";
-        } else if (shiftstart.equals(LocalTime.parse("07:00")) && lunchStart.equals(LocalTime.parse("12:00"))) {
+        } else if (shiftstart.equals(LocalTime.parse("07:00", TIME_FORMATTER)) && lunchStart.equals(LocalTime.parse("12:00", TIME_FORMATTER))) {
             return "Shift 1";
-        } else if (shiftstart.equals(LocalTime.parse("12:00"))) {
+        } else if (shiftstart.equals(LocalTime.parse("12:00", TIME_FORMATTER))) {
             return "Shift 2";
         }
         return "Unknown Shift";
@@ -153,5 +114,17 @@ public class Shift {
 
     public String getShiftType() {
         return shiftType;
+    }
+
+    public Duration getGracePeriod() {
+        return graceperiod;
+    }
+
+    public Duration getDockPenalty() {
+        return dockpenalty;
+    }
+
+    public Duration getRoundInterval() {
+        return roundinterval;
     }
 }

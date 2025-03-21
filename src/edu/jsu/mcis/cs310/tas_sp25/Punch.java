@@ -3,6 +3,7 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 /*
  * Purpose: represent a timestamp when an employee clocks in/out 
@@ -52,10 +53,78 @@ public class Punch {
         this.originaltimestamp = originaltimestamp;
         this.adjustedTimestamp = null;
         this.adjustmenttype = PunchAdjustmentType.NONE;
-
     }
+<<<<<<< HEAD
     //adjust method
    
+=======
+    
+    public void adjust(Shift s) {        
+        LocalTime shiftStart = s.getStartTime();
+        LocalTime shiftStop = s.getStopTime();
+        LocalTime lunchStart = s.getLunchStart();
+        LocalTime lunchStop = s.getLunchStop();
+        Duration gracePeriod = s.getGracePeriod();
+        Duration dockPenalty = s.getDockPenalty();
+        Duration roundInterval = s.getRoundInterval();
+        
+        LocalDateTime timestamp = this.originaltimestamp;
+        LocalTime time = timestamp.toLocalTime();
+        DayOfWeek dayOfWeek = timestamp.getDayOfWeek();
+
+        adjustedTimestamp = originaltimestamp;
+        adjustmenttype = PunchAdjustmentType.NONE;
+
+        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+            adjustedTimestamp = timestamp.withSecond(0).withNano(0);
+            return;
+        }
+
+        boolean isClockIn = (punchtype == EventType.CLOCK_IN);
+        boolean isClockOut = (punchtype == EventType.CLOCK_OUT);
+
+        if (isClockIn && time.isBefore(shiftStart) && Duration.between(time, shiftStart).compareTo(roundInterval) <= 0) {
+            adjustedTimestamp = timestamp.with(shiftStart);
+            adjustmenttype = PunchAdjustmentType.SHIFT_START;
+            return;
+        }
+
+        if (isClockOut && time.isAfter(shiftStop) && Duration.between(time, shiftStop).compareTo(roundInterval) <= 0) {
+            adjustedTimestamp = timestamp.with(shiftStop);
+            adjustmenttype = PunchAdjustmentType.SHIFT_STOP;
+            return;
+        }
+
+        if (isClockIn && time.equals(lunchStart)) {
+            adjustedTimestamp = timestamp.with(lunchStart);
+            adjustmenttype = PunchAdjustmentType.LUNCH_START;
+            return;
+        }
+
+        if (isClockIn && time.equals(lunchStop)) {
+            adjustedTimestamp = timestamp.with(lunchStop);
+            adjustmenttype = PunchAdjustmentType.LUNCH_STOP;
+            return;
+        }
+
+        if (isClockIn && time.isAfter(shiftStart) && Duration.between(shiftStart, time).compareTo(gracePeriod) <= 0) {
+            adjustedTimestamp = timestamp.with(shiftStart);
+            adjustmenttype = PunchAdjustmentType.SHIFT_START;
+            return;
+        }
+
+        if (isClockIn && time.isAfter(shiftStart) && Duration.between(shiftStart, time).compareTo(gracePeriod) > 0) {
+            adjustedTimestamp = timestamp.with(shiftStart.plus(dockPenalty));
+            adjustmenttype = PunchAdjustmentType.SHIFT_DOCK;
+            return;
+        }
+
+        int roundedMinutes = (time.getMinute() / (int)roundInterval.toMinutes()) * (int)roundInterval.toMinutes();
+        adjustedTimestamp = timestamp.withMinute(roundedMinutes).withSecond(0).withNano(0);
+        adjustmenttype = PunchAdjustmentType.INTERVAL_ROUND;
+    }
+
+>>>>>>> 7b200626e1a2abd9a8fe6e835b58b4ad4ba6fded
     //Getters and setters
 
     public Integer getId() {

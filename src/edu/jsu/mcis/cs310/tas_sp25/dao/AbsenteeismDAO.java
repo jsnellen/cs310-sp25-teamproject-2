@@ -2,33 +2,35 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-
-
-
 package edu.jsu.mcis.cs310.tas_sp25.dao;
 
 /**
  *
  * @author brooklynleonard
  */
-import edu.jsu.mcis.cs310.tas_sp25.*;
-import java.sql.*;
-import java.util.HashMap;
 
+import edu.jsu.mcis.cs310.tas_sp25.Absenteeism;
+import edu.jsu.mcis.cs310.tas_sp25.Employee;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class ShiftDAO {
+public class AbsenteeismDAO {
 
-    private static final String QUERY_FIND = "SELECT * FROM shift WHERE id = ?";
-    private static final String QUERY_FIND_BY_BADGE = "SELECT * FROM shift WHERE id = (SELECT shiftid FROM badge WHERE id = ?)";
+    private static final String QUERY_FIND = "SELECT * FROM absenteeism WHERE employeeid = ? AND payperiod = ?";
+    private static final String QUERY_CREATE = "REPLACE INTO absenteeism (employeeid, payperiod, percentage) VALUES (?, ?, ?)";
 
     private final DAOFactory daoFactory;
 
-    ShiftDAO(DAOFactory daoFactory) {
+    AbsenteeismDAO(DAOFactory daoFactory) {
         this.daoFactory = daoFactory;
     }
 
-    public Shift find(int id) {
-        Shift shift = null;
+    public Absenteeism find(Employee employee, LocalDate payPeriod) {
+        Absenteeism absenteeism = null;
 
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -38,7 +40,8 @@ public class ShiftDAO {
 
             if (conn.isValid(0)) {
                 ps = conn.prepareStatement(QUERY_FIND);
-                ps.setInt(1, id);
+                ps.setInt(1, employee.getId());
+                ps.setDate(2, java.sql.Date.valueOf(payPeriod));
 
                 boolean hasResults = ps.execute();
 
@@ -46,22 +49,13 @@ public class ShiftDAO {
                     rs = ps.getResultSet();
 
                     while (rs.next()) {
-                        // Create a HashMap to store the shift data
-                        HashMap<String, String> shiftData = new HashMap<>();
-                        shiftData.put("start", rs.getString("shiftstart")); // Corrected key
-                        shiftData.put("stop", rs.getString("shiftstop"));
-                        shiftData.put("lunchstart", rs.getString("lunchstart"));
-                        shiftData.put("lunchstop", rs.getString("lunchstop"));
-                        
-                        // Create a new Shift object using the shiftData HashMap
-                        shift = new Shift(shiftData);
+                        BigDecimal percentage = rs.getBigDecimal("percentage");
+                        absenteeism = new Absenteeism(employee, payPeriod, percentage);
                     }
                 }
             }
-
         } catch (SQLException e) {
             throw new DAOException(e.getMessage());
-
         } finally {
             if (rs != null) {
                 try {
@@ -79,45 +73,26 @@ public class ShiftDAO {
             }
         }
 
-        return shift;
+        return absenteeism;
     }
 
-    public Shift find(Badge badge) {
-        Shift shift = null;
-
+    public void create(Absenteeism absenteeism) {
         PreparedStatement ps = null;
-        ResultSet rs = null;
 
         try {
             Connection conn = daoFactory.getConnection();
 
             if (conn.isValid(0)) {
-                ps = conn.prepareStatement(QUERY_FIND_BY_BADGE);
-                ps.setString(1, badge.getId());
+                ps = conn.prepareStatement(QUERY_CREATE);
+                ps.setInt(1, absenteeism.getEmployee().getId());
+                ps.setDate(2, java.sql.Date.valueOf(absenteeism.getLocalDate()));
+                ps.setBigDecimal(3, absenteeism.getBigDecimal());
 
-                boolean hasResults = ps.execute();
-
-                if (hasResults) {
-                    rs = ps.getResultSet();
-
-                    while (rs.next()) {
-                        int shiftId = rs.getInt("shiftid");
-                        shift = find(shiftId);
-                    }
-                }
+                ps.executeUpdate();
             }
-
         } catch (SQLException e) {
             throw new DAOException(e.getMessage());
-
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    throw new DAOException(e.getMessage());
-                }
-            }
             if (ps != null) {
                 try {
                     ps.close();
@@ -126,8 +101,5 @@ public class ShiftDAO {
                 }
             }
         }
-
-        return shift;
     }
 }
-
