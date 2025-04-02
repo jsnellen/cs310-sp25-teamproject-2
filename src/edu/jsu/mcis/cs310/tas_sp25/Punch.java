@@ -55,6 +55,7 @@ public class Punch {
         this.adjustmenttype = PunchAdjustmentType.NONE;
     }
     
+    //extract shift start, stop, lunch in and out, grace period, dock penalty, and interval
     public void adjust(Shift s) {        
         LocalTime shiftStart = s.getStartTime();
         LocalTime shiftStop = s.getStopTime();
@@ -71,14 +72,17 @@ public class Punch {
         adjustedTimestamp = originaltimestamp;
         adjustmenttype = PunchAdjustmentType.NONE;
 
+        //Determine if it is a weekend
         if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
             adjustedTimestamp = timestamp.withSecond(0).withNano(0);
             return;
         }
 
+        //Determine if the user is clocking in or clocking out
         boolean isClockIn = (punchtype == EventType.CLOCK_IN);
         boolean isClockOut = (punchtype == EventType.CLOCK_OUT);
 
+        //Scenario 1: Employee clocks in early or clocks out late
         if (isClockIn && time.isBefore(shiftStart) && Duration.between(time, shiftStart).compareTo(roundInterval) <= 0) {
             adjustedTimestamp = timestamp.with(shiftStart);
             adjustmenttype = PunchAdjustmentType.SHIFT_START;
@@ -90,7 +94,9 @@ public class Punch {
             adjustmenttype = PunchAdjustmentType.SHIFT_STOP;
             return;
         }
-
+        
+        
+        //Scenario 2: Employee click out for lunch too early or too late
         if (isClockIn && time.equals(lunchStart)) {
             adjustedTimestamp = timestamp.with(lunchStart);
             adjustmenttype = PunchAdjustmentType.LUNCH_START;
@@ -102,19 +108,24 @@ public class Punch {
             adjustmenttype = PunchAdjustmentType.LUNCH_STOP;
             return;
         }
-
+        
+        
+        //Scario 3: Grace period for late/early clock ins
         if (isClockIn && time.isAfter(shiftStart) && Duration.between(shiftStart, time).compareTo(gracePeriod) <= 0) {
             adjustedTimestamp = timestamp.with(shiftStart);
             adjustmenttype = PunchAdjustmentType.SHIFT_START;
             return;
         }
 
+        
+        //Scenario 4: Dock penalty for clock ins that exceed the grace period
         if (isClockIn && time.isAfter(shiftStart) && Duration.between(shiftStart, time).compareTo(gracePeriod) > 0) {
             adjustedTimestamp = timestamp.with(shiftStart.plus(dockPenalty));
             adjustmenttype = PunchAdjustmentType.SHIFT_DOCK;
             return;
         }
 
+        //Scenario 5: If no rules apply, the punch is rounded to the nearest increment of the interval
         int roundedMinutes = (time.getMinute() / (int)roundInterval.toMinutes()) * (int)roundInterval.toMinutes();
         adjustedTimestamp = timestamp.withMinute(roundedMinutes).withSecond(0).withNano(0);
         adjustmenttype = PunchAdjustmentType.INTERVAL_ROUND;
@@ -158,6 +169,7 @@ public class Punch {
         this.adjustmenttype = adjustmentType;
     }
     
+    //StringBuilder for printOriginal
     public String printOriginal(){
         
     StringBuilder s = new StringBuilder();
@@ -171,6 +183,7 @@ public class Punch {
     return s.toString();
     }
     
+    //StringBuilder for printAdjusted
     public String printAdjusted(){
         
         StringBuilder s = new StringBuilder();
