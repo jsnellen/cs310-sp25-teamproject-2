@@ -24,84 +24,87 @@ public class EmployeeDAO {
     }
 
     public Employee find(Integer id) {
-        Employee employee = null;
+    Employee employee = null;
 
-        try (Connection conn = daoFactory.getConnection();
-             PreparedStatement ps = conn.prepareStatement(QUERY_FIND)) {
+    try (Connection conn = daoFactory.getConnection();
+         PreparedStatement ps = conn.prepareStatement(QUERY_FIND)) {
+        
+        ps.setInt(1, id);
+        
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                // Extract data before calling other DAO methods
+                String badgeId = rs.getString("badgeid");
+                int departmentId = rs.getInt("departmentid");
+                int shiftId = rs.getInt("shiftid");
+                int employeeTypeNum = rs.getInt("employeetypeid");
+                String activeString = rs.getString("active");
 
-            ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    System.out.println("Found Employee ID: " + rs.getInt("id"));
+                // Convert DateTime
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDateTime active = LocalDateTime.parse(activeString, dtf);
 
-                    // Get Badge
-                    String badgeId = rs.getString("badgeid");
-                    Badge badge = badgeDAO.find(badgeId);
-                    System.out.println("Badge ID: " + badgeId);
+                // Fetch related objects AFTER result set is closed
+                Badge badge = badgeDAO.find(badgeId);
+                Department department = departmentDAO.find(departmentId);
+                Shift shift = shiftDAO.find(shiftId);
+                EmployeeType employeeType = (employeeTypeNum == 0) ? EmployeeType.PART_TIME : EmployeeType.FULL_TIME;
 
-                    // Get Name
-                    String[] fullName = badge.getDescription().split(",\\s+");
-                    String lastName = fullName[0];
-                    String firstName = fullName[1].split(" ")[0];
-                    String middleName = (fullName[1].split(" ").length > 1) ? fullName[1].split(" ")[1] : "";
+                // Extract employee name
+                String[] fullName = badge.getDescription().split(",\\s+");
+                String lastName = fullName[0];
+                String firstName = fullName[1].split(" ")[0];
+                String middleName = (fullName[1].split(" ").length > 1) ? fullName[1].split(" ")[1] : "";
 
-                    // Get Active Date
-                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                    LocalDateTime active = LocalDateTime.parse(rs.getString("active"), dtf);
+                // Create Employee object
+                HashMap<String, Object> employeeParams = new HashMap<>();
+                employeeParams.put("id", id);
+                employeeParams.put("firstName", firstName);
+                employeeParams.put("middleName", middleName);
+                employeeParams.put("lastName", lastName);
+                employeeParams.put("active", active);
+                employeeParams.put("badge", badge);
+                employeeParams.put("department", department);
+                employeeParams.put("shift", shift);
+                employeeParams.put("employeeType", employeeType);
 
-                    // Get Department
-                    int departmentId = rs.getInt("departmentid");
-                    Department department = departmentDAO.find(departmentId);
-
-                    // Get Shift
-                    Shift shift = shiftDAO.find(rs.getInt("shiftid"));
-
-                    // Get Employee Type
-                    int employeeTypeNum = rs.getInt("employeetypeid");
-                    EmployeeType employeeType = switch (employeeTypeNum) {
-                        case 0 -> EmployeeType.PART_TIME;
-                        case 1 -> EmployeeType.FULL_TIME;
-                        default -> throw new IllegalArgumentException("Invalid employeeType id: " + employeeTypeNum);
-                    };
-
-                    // Create Employee Object
-                    HashMap<String, Object> employeeParams = new HashMap<>();
-                    employeeParams.put("id", id);
-                    employeeParams.put("firstName", firstName);
-                    employeeParams.put("middleName", middleName);
-                    employeeParams.put("lastName", lastName);
-                    employeeParams.put("active", active);
-                    employeeParams.put("badge", badge);
-                    employeeParams.put("department", department);
-                    employeeParams.put("shift", shift);
-                    employeeParams.put("employeeType", employeeType);
-
-                    employee = new Employee(employeeParams);
-                }
+                employee = new Employee(employeeParams);
             }
-        } catch (SQLException e) {
-            throw new DAOException("SQL Error in find(Integer id): " + e.getMessage());
         }
-
-        return employee;
+    } catch (SQLException e) {
+        throw new DAOException("SQL Error in find(Integer id): " + e.getMessage());
     }
+
+    return employee;
+}
     
     public Employee find(Badge badge) {
         Employee employee = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
-        try (Connection conn = daoFactory.getConnection();
-             PreparedStatement ps = conn.prepareStatement(QUERY_FIND2)) {
+        try {
+            Connection conn = daoFactory.getConnection();
 
-            ps.setString(1, badge.getId());
-            try (ResultSet rs = ps.executeQuery()) {
+            if (conn.isValid(0)) {
+                ps = conn.prepareStatement(QUERY_FIND2);
+                ps.setString(1, badge.getId());
+                rs = ps.executeQuery();
+
                 if (rs.next()) {
                     int employeeId = rs.getInt("id");
-                    System.out.println("Found Employee ID: " + employeeId + " for Badge: " + badge.getId());
                     employee = find(employeeId);
                 }
             }
         } catch (SQLException e) {
             throw new DAOException("SQL Error in find(Badge badge): " + e.getMessage());
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+            } catch (SQLException e) {
+                throw new DAOException(e.getMessage());
+            }
         }
 
         return employee;
