@@ -32,14 +32,14 @@ public class PunchDAO {
                 int terminalId = rs.getInt("terminalid");
                 String badgeID = rs.getString("badgeid");
                 LocalDateTime timestamp = rs.getTimestamp("timestamp").toLocalDateTime();
-                EventType punchType = EventType.values()[rs.getInt("punchtype")];
+                EventType punchtype = EventType.values()[rs.getInt("punchtype")];
 
                 // Retrieve the Badge that corresponds to the Punch ID
                 BadgeDAO badgeDAO = new BadgeDAO(daoFactory);
                 Badge badge = badgeDAO.find(badgeID);
 
                 // Return the Punch with the retrieved data
-                return new Punch(id, terminalId, badge, timestamp, punchType);
+                return new Punch(id, terminalId, badge, timestamp, punchtype);
             }
         } catch (SQLException e) {
             e.printStackTrace(); // Handle SQL exceptions
@@ -106,9 +106,9 @@ public class PunchDAO {
                     int id = rs.getInt("id");
                     int terminalId = rs.getInt("terminalid");
                     LocalDateTime timestamp = rs.getTimestamp("timestamp").toLocalDateTime();
-                    EventType punchType = EventType.values()[rs.getInt("punchtype")];
+                    EventType punchtype = EventType.values()[rs.getInt("punchtype")];
 
-                    punches.add(new Punch(id, terminalId, badge, timestamp, punchType));
+                    punches.add(new Punch(id, terminalId, badge, timestamp, punchtype));
                 }
             }
 
@@ -128,10 +128,10 @@ public class PunchDAO {
                         int id = rsNext.getInt("id");
                         int terminalId = rsNext.getInt("terminalid");
                         LocalDateTime timestamp = rsNext.getTimestamp("timestamp").toLocalDateTime();
-                        EventType punchType = EventType.values()[rsNext.getInt("punchtype")];
+                        EventType punchtype = EventType.values()[rsNext.getInt("punchtype")];
 
-                        if (punchType == EventType.CLOCK_OUT || punchType == EventType.TIME_OUT) {
-                            punches.add(new Punch(id, terminalId, badge, timestamp, punchType));
+                        if (punchtype == EventType.CLOCK_OUT || punchtype == EventType.TIME_OUT) {
+                            punches.add(new Punch(id, terminalId, badge, timestamp, punchtype));
                         }
                     }
                 }
