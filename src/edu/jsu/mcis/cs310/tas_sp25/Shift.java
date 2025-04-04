@@ -1,130 +1,98 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package edu.jsu.mcis.cs310.tas_sp25;
 
-/**
- *
- * @author brooklynleonard
- */
-
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.Duration;
-import java.util.Map;
+import java.time.*;
+import java.util.HashMap;
 
 public class Shift {
-    private LocalTime shiftstart;
-    private LocalTime stopTime;
-    private LocalTime lunchStart;
-    private LocalTime lunchStop;
-    private int totalMinutes;
-    private int lunchMinutes;
-    private String shiftType;
-    private Duration graceperiod;
-    private Duration dockpenalty;
-    private Duration roundinterval;
+    
+    private final String description;
+    private final Integer id;
+    private final DailySchedule defaultschedule;
+    public HashMap<Integer, DailySchedule> scheduleList;
+    
+    public Shift(HashMap<String, String> shift, DailySchedule dailySchedule) {
+        this.id = Integer.valueOf(shift.get("id"));
+        this.description = shift.get("description");
+        this.defaultschedule = dailySchedule;
+        addSchedules();
+    }
 
+    public void addSchedules() {
+        for (int i = 1; i <= 5; i++) {
+            scheduleList.put(i, this.defaultschedule);
+        }
+    }
 
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm[:ss]");
-
-    public Shift(Map<String, String> shiftData) {
-        // Parse times
-        this.shiftstart = LocalTime.parse(shiftData.get("start"), TIME_FORMATTER);
-        this.stopTime = LocalTime.parse(shiftData.get("stop"), TIME_FORMATTER);
-        this.lunchStart = LocalTime.parse(shiftData.get("lunchstart"), TIME_FORMATTER);
-        this.lunchStop = LocalTime.parse(shiftData.get("lunchstop"), TIME_FORMATTER);
-
-        // Calculate total shift minutes
-        this.totalMinutes = (int) Duration.between(shiftstart, stopTime).toMinutes();
-
-        // Calculate lunch minutes
-        this.lunchMinutes = (int) Duration.between(lunchStart, lunchStop).toMinutes();
-
-        // Determine shift type
-        this.shiftType = determineShiftType();
+    public DailySchedule getDailyschedule(DayOfWeek dayOfWeek) {
+        for(int i = 0; i < scheduleList.size(); i++) {
+            if(scheduleList.containsKey(i)) {
+                return scheduleList.get(i);
+            }
+        }
+        return defaultschedule;
     }
     
-    //ensures that the string is in the correct format
-    private LocalTime parseTime(String timeString){
-        if(timeString.length() == 5){
-            timeString += ".00";
-        }
-        return LocalTime.parse(timeString, TIME_FORMATTER);
+    public String getDescription() {
+        return this.description;
     }
-
-    private String determineShiftType() {
-        if (shiftstart.equals(LocalTime.parse("07:00", TIME_FORMATTER)) && lunchStart.equals(LocalTime.parse("11:30", TIME_FORMATTER))) {
-            return "Shift 1 Early Lunch";
-        } else if (shiftstart.equals(LocalTime.parse("07:00", TIME_FORMATTER)) && lunchStart.equals(LocalTime.parse("12:00", TIME_FORMATTER))) {
-            return "Shift 1";
-        } else if (shiftstart.equals(LocalTime.parse("12:00", TIME_FORMATTER))) {
-            return "Shift 2";
-        }
-        return "Unknown Shift";
+    
+    public int getId() {
+        return this.id;
     }
-
+    
+    public DailySchedule getDefaultSchedule() {
+        return this.defaultschedule;
+    }
+    
+    public int getRoundInterval() {
+        return this.defaultschedule.getRoundInterval();
+    }
+    
+    public int getGracePeriod() {
+        return this.defaultschedule.getGracePeriod();
+    }
+    
+    public int getDockPenalty() {
+        return this.defaultschedule.getDockPenalty();
+    }
+    
+    public int getLunchThreshold() {
+        return this.defaultschedule.getLunchThreshold();
+    }
+    
+    public Duration getShiftDuration() {
+        return this.defaultschedule.getShiftDuration();
+    }
+    
+    public Duration getLunchDuration() {
+        return this.defaultschedule.getLunchDuration();
+    }
+    
+    public LocalTime getShiftStart() {
+        return this.defaultschedule.getShiftStart();
+    }
+    
+    public LocalTime getShiftStop() {
+        return this.defaultschedule.getShiftStop();
+    }
+    
+    public LocalTime getLunchStart() {
+        return this.defaultschedule.getLunchStart();
+    }
+    
+    public LocalTime getLunchStop() {
+        return this.defaultschedule.getLunchStop();
+    }
+    
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        
-        sb.append(shiftType)
-          .append(": ")
-          .append(shiftstart.format(TIME_FORMATTER))
-          .append(" - ")
-          .append(stopTime.format(TIME_FORMATTER))
-          .append(" (")
-          .append(totalMinutes)
-          .append(" minutes); Lunch: ")
-          .append(lunchStart.format(TIME_FORMATTER))
-          .append(" - ")
-          .append(lunchStop.format(TIME_FORMATTER))
-          .append(" (")
-          .append(lunchMinutes)
-          .append(" minutes)");
-        
-        return sb.toString();
-    }
 
-    // Getters (if needed)
-    public LocalTime getStartTime() {
-        return shiftstart;
-    }
+        StringBuilder s = new StringBuilder();
 
-    public LocalTime getStopTime() {
-        return stopTime;
-    }
+        s.append(description).append(": ").append(getShiftStart()).append(" - ").append(getShiftStop()).append(" (");
+        s.append(getShiftDuration().toMinutes()).append(" minutes); Lunch: ").append(getLunchStart()).append(" - ").append(getLunchStop());
+        s.append(" (").append(getLunchDuration().toMinutes()).append(" minutes)");
 
-    public LocalTime getLunchStart() {
-        return lunchStart;
-    }
-
-    public LocalTime getLunchStop() {
-        return lunchStop;
-    }
-
-    public int getTotalMinutes() {
-        return totalMinutes;
-    }
-
-    public int getLunchMinutes() {
-        return lunchMinutes;
-    }
-
-    public String getShiftType() {
-        return shiftType;
-    }
-
-    public Duration getGracePeriod() {
-        return graceperiod;
-    }
-
-    public Duration getDockPenalty() {
-        return dockpenalty;
-    }
-
-    public Duration getRoundInterval() {
-        return roundinterval;
+        return s.toString();
     }
 }

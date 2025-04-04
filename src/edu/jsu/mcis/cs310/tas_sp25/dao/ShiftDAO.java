@@ -1,79 +1,94 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-
-
 package edu.jsu.mcis.cs310.tas_sp25.dao;
 
 /**
  *
  * @author brooklynleonard
  */
+
 import edu.jsu.mcis.cs310.tas_sp25.*;
 import java.sql.*;
+import java.time.*;
 import java.util.HashMap;
-
 
 public class ShiftDAO {
 
-    private static final String QUERY_FIND = "SELECT * FROM shift WHERE id = ?";
-    private static final String QUERY_FIND_BY_BADGE = "SELECT * FROM shift WHERE id = (SELECT shiftid FROM badge WHERE id = ?)";
-
+    // more descriptive names for queries
+    private static final String QUERY_GET_SHIFT = "SELECT * FROM shift WHERE id = ?";
+    private static final String QUERY_GET_EMPLOYEE = "SELECT * FROM employee WHERE badgeid = ?";
+    private static final String QUERY_GET_DAILYSCHEDULE = "SELECT * FROM dailyschedule WHERE id = ?";
+  
     private final DAOFactory daoFactory;
 
-    ShiftDAO(DAOFactory daoFactory) {
+    ShiftDAO(DAOFactory daoFactory) { 
+
         this.daoFactory = daoFactory;
+
     }
 
     public Shift find(int id) {
-        Shift shift = null;
 
+        Shift shift = null;
+      
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
+
             Connection conn = daoFactory.getConnection();
 
             if (conn.isValid(0)) {
-                ps = conn.prepareStatement(QUERY_FIND);
+
+                ps = conn.prepareStatement(QUERY_GET_SHIFT);
                 ps.setInt(1, id);
 
-                boolean hasResults = ps.execute();
+                boolean hasresults = ps.execute();
 
-                if (hasResults) {
+                if (hasresults) {
+
                     rs = ps.getResultSet();
 
                     while (rs.next()) {
-                        // Create a HashMap to store the shift data
-                        HashMap<String, String> shiftData = new HashMap<>();
-                        shiftData.put("start", rs.getString("shiftstart")); // Corrected key
-                        shiftData.put("stop", rs.getString("shiftstop"));
-                        shiftData.put("lunchstart", rs.getString("lunchstart"));
-                        shiftData.put("lunchstop", rs.getString("lunchstop"));
                         
-                        // Create a new Shift object using the shiftData HashMap
-                        shift = new Shift(shiftData);
+                        HashMap<String, String> shiftSet = new HashMap<>();
+                        
+                        shiftSet.put("id", ((Integer) id).toString());
+                        shiftSet.put("description", rs.getString("description"));
+                        
+                        int dailyScheduleId = rs.getInt("dailyscheduleid");
+                        DailySchedule dailySchedule = findDailySchedule(dailyScheduleId);
+                        //System.out.println(dailySchedule);
+                        shift = new Shift(shiftSet, dailySchedule);
+
                     }
                 }
             }
 
         } catch (SQLException e) {
+
             throw new DAOException(e.getMessage());
 
         } finally {
+
             if (rs != null) {
+                
                 try {
+                  
                     rs.close();
+                    
                 } catch (SQLException e) {
+                    
                     throw new DAOException(e.getMessage());
                 }
             }
+            
             if (ps != null) {
+                
                 try {
+                    
                     ps.close();
+                    
                 } catch (SQLException e) {
+                    
                     throw new DAOException(e.getMessage());
                 }
             }
@@ -81,47 +96,62 @@ public class ShiftDAO {
 
         return shift;
     }
-
+    
     public Shift find(Badge badge) {
+
         Shift shift = null;
 
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
+
             Connection conn = daoFactory.getConnection();
 
             if (conn.isValid(0)) {
-                ps = conn.prepareStatement(QUERY_FIND_BY_BADGE);
+
+                ps = conn.prepareStatement(QUERY_GET_EMPLOYEE);
                 ps.setString(1, badge.getId());
 
-                boolean hasResults = ps.execute();
+                boolean hasresults = ps.execute();
 
-                if (hasResults) {
+                if (hasresults) {
+
                     rs = ps.getResultSet();
 
                     while (rs.next()) {
-                        int shiftId = rs.getInt("shiftid");
-                        shift = find(shiftId);
+                        
+                        shift = find(rs.getInt("shiftid"));
                     }
                 }
             }
 
         } catch (SQLException e) {
+
             throw new DAOException(e.getMessage());
 
         } finally {
+
             if (rs != null) {
+                
                 try {
+                    
                     rs.close();
+                    
                 } catch (SQLException e) {
+                    
                     throw new DAOException(e.getMessage());
                 }
             }
+            
             if (ps != null) {
+                
                 try {
+                    
                     ps.close();
+                    
                 } catch (SQLException e) {
+                    
                     throw new DAOException(e.getMessage());
                 }
             }
@@ -129,5 +159,110 @@ public class ShiftDAO {
 
         return shift;
     }
-}
 
+    private Shift find(Badge badge, LocalDate date) {
+
+        Shift shift = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        return null;
+
+    }
+    
+    private DailySchedule findDailySchedule(int id) {
+        
+        DailySchedule dailySchedule = null;
+
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+
+            Connection conn = daoFactory.getConnection();
+
+            if (conn.isValid(0)) {
+
+                ps = conn.prepareStatement(QUERY_GET_DAILYSCHEDULE);
+                ps.setInt(1, id);
+
+                boolean hasresults = ps.execute();
+
+                if (hasresults) {
+
+                    rs = ps.getResultSet();
+
+                    while (rs.next()) {
+                        
+                        HashMap<String, String> dailyScheduleSet = new HashMap<>();
+                        
+                        dailyScheduleSet.put("id", ((Integer) id).toString());
+                        
+                        LocalTime shiftStart = rs.getTime("shiftstart").toLocalTime();
+                        System.out.println(shiftStart);
+                        LocalTime shiftStop = rs.getTime("shiftstop").toLocalTime();
+                        
+                        dailyScheduleSet.put("shiftStart", shiftStart.toString());
+                        dailyScheduleSet.put("shiftStop", shiftStop.toString());
+                        
+                        dailyScheduleSet.put("roundInterval", ((Integer) rs.getInt("roundinterval")).toString());
+                        dailyScheduleSet.put("gracePeriod", ((Integer) rs.getInt("graceperiod")).toString());
+                        dailyScheduleSet.put("dockPenalty", ((Integer) rs.getInt("dockpenalty")).toString());
+                        
+                        LocalTime lunchStart = rs.getTime("lunchstart").toLocalTime();
+                        LocalTime lunchStop = rs.getTime("lunchstop").toLocalTime();
+                        
+                        dailyScheduleSet.put("lunchStart", lunchStart.toString());
+                        dailyScheduleSet.put("lunchStop", lunchStop.toString());
+                        dailyScheduleSet.put("lunchThreshold", ((Integer) rs.getInt("lunchthreshold")).toString());
+                        
+                        Duration shiftDuration = Duration.between(shiftStart, shiftStop);
+                        
+                        if (shiftDuration.isNegative()) {
+                            
+                            LocalTime posDuration = shiftStart.minus(shiftDuration);
+                            shiftDuration = Duration.between(posDuration, shiftStart);
+                        }
+                        
+                        Duration lunchDuration = Duration.between(lunchStart, lunchStop);
+                        dailyScheduleSet.put("shiftDuration", shiftDuration.toString());
+                        dailyScheduleSet.put("lunchDuration", lunchDuration.toString());
+                        
+                        dailySchedule = new DailySchedule(dailyScheduleSet);
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+
+            throw new DAOException(e.getMessage());
+
+        } finally {
+
+            if (rs != null) {
+                
+                try {
+                    
+                    rs.close();
+                    
+                } catch (SQLException e) {
+                    
+                    throw new DAOException(e.getMessage());
+                }
+            }
+            
+            if (ps != null) {
+                
+                try {
+                    
+                    ps.close();
+                    
+                } catch (SQLException e) {
+                    
+                    throw new DAOException(e.getMessage());
+                }
+            }
+        }
+
+        return dailySchedule;
+    }
+}

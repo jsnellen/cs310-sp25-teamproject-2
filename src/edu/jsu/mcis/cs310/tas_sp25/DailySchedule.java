@@ -1,111 +1,117 @@
 package edu.jsu.mcis.cs310.tas_sp25;
 
-import java.time.LocalTime;
+import java.time.*;
+import java.util.HashMap;
+
+/**
+ * A method that rule set data for a day. Originally found in Shift.java
+ * 
+ * @author Aidan
+ */
 
 public class DailySchedule {
-
-    // Instance fields corresponding to the columns in the "dailyschedule" table
-    private LocalTime shiftStart;
-    private LocalTime shiftStop;
-    private LocalTime lunchStart;
-    private LocalTime lunchStop;
-    private int interval;                 // in minutes
-    private int gracePeriod;              // in minutes
-    private int dockPenalty;              // in minutes
-    private int lunchDeductionThreshold;  // in minutes
-
-    // Constructor to initialize all fields
-    public DailySchedule(LocalTime shiftStart, LocalTime shiftStop,
-                         LocalTime lunchStart, LocalTime lunchStop,
-                         int interval, int gracePeriod, int dockPenalty,
-                         int lunchDeductionThreshold) {
-        this.shiftStart = shiftStart;
-        this.shiftStop = shiftStop;
-        this.lunchStart = lunchStart;
-        this.lunchStop = lunchStop;
-        this.interval = interval;
-        this.gracePeriod = gracePeriod;
-        this.dockPenalty = dockPenalty;
-        this.lunchDeductionThreshold = lunchDeductionThreshold;
+    
+    /**
+     * roundInterval - The interval rounded by in the event a punch is very late
+     * gracePeriod - The safety time where no penalties are made
+     * dockPenalty - The amount of time docked in the event of a punch made too late
+     * lunchThreshold - The amount of time that determines whether a shift requires a lunch
+     * shiftDuration - The time between the start and stop of a shift
+     * lunchDuration - The time between the start and stop of a lunch
+     * shiftStart - The start time of a shift
+     * shiftStop - The stop time of a shift
+     * lunchStart - The start time of a lunch
+     * lunchStop - The stop time of a lunch
+     */
+    private final Integer roundInterval, gracePeriod, dockPenalty, lunchThreshold;
+    private final Duration shiftDuration, lunchDuration;
+    private final LocalTime shiftStart, shiftStop, lunchStart, lunchStop;
+    
+    /**
+     * A constructor holding the information of a shift rule set
+     * 
+     * @param schedule Passes the shift rule set into the constructor via HashMap
+     */
+    public DailySchedule(HashMap<String, String> schedule) {
+        this.shiftStart = LocalTime.parse(schedule.get("shiftStart"));
+        this.shiftStop = LocalTime.parse(schedule.get("shiftStop"));
+        this.roundInterval = Integer.valueOf(schedule.get("roundInterval"));
+        this.gracePeriod = Integer.valueOf(schedule.get("gracePeriod"));
+        this.dockPenalty = Integer.valueOf(schedule.get("dockPenalty"));
+        this.lunchStart = LocalTime.parse(schedule.get("lunchStart"));
+        this.lunchStop = LocalTime.parse(schedule.get("lunchStop"));
+        this.lunchThreshold = Integer.valueOf(schedule.get("lunchThreshold"));
+        this.shiftDuration = Duration.parse(schedule.get("shiftDuration"));
+        this.lunchDuration = Duration.parse(schedule.get("lunchDuration"));
     }
-
-    // Getters and Setters
-
-    public LocalTime getShiftStart() {
-        return shiftStart;
+    
+    /**
+     * @return roundInterval
+     */
+    public int getRoundInterval() {
+        return this.roundInterval;
     }
-
-    public void setShiftStart(LocalTime shiftStart) {
-        this.shiftStart = shiftStart;
-    }
-
-    public LocalTime getShiftStop() {
-        return shiftStop;
-    }
-
-    public void setShiftStop(LocalTime shiftStop) {
-        this.shiftStop = shiftStop;
-    }
-
-    public LocalTime getLunchStart() {
-        return lunchStart;
-    }
-
-    public void setLunchStart(LocalTime lunchStart) {
-        this.lunchStart = lunchStart;
-    }
-
-    public LocalTime getLunchStop() {
-        return lunchStop;
-    }
-
-    public void setLunchStop(LocalTime lunchStop) {
-        this.lunchStop = lunchStop;
-    }
-
-    public int getInterval() {
-        return interval;
-    }
-
-    public void setInterval(int interval) {
-        this.interval = interval;
-    }
-
+    
+    /**
+     * @return gracePeriod
+     */
     public int getGracePeriod() {
-        return gracePeriod;
+        return this.gracePeriod;
     }
-
-    public void setGracePeriod(int gracePeriod) {
-        this.gracePeriod = gracePeriod;
-    }
-
+    
+    /**
+     * @return dockPenalty
+     */
     public int getDockPenalty() {
-        return dockPenalty;
+        return this.dockPenalty;
     }
-
-    public void setDockPenalty(int dockPenalty) {
-        this.dockPenalty = dockPenalty;
+    
+    /**
+     * @return lunchThreshold
+     */
+    public int getLunchThreshold() {
+        return this.lunchThreshold;
     }
-
-    public int getLunchDeductionThreshold() {
-        return lunchDeductionThreshold;
+    
+    /**
+     * @return shiftDuration
+     */
+    public Duration getShiftDuration() {
+        return this.shiftDuration;
     }
-
-    public void setLunchDeductionThreshold(int lunchDeductionThreshold) {
-        this.lunchDeductionThreshold = lunchDeductionThreshold;
+    
+    /**
+     * @return lunchDuration
+     */
+    public Duration getLunchDuration() {
+        return this.lunchDuration;
     }
-
-    @Override
-    public String toString() {
-        return "DailySchedule{" +
-                "shiftStart=" + shiftStart +
-                ", shiftStop=" + shiftStop +
-                ", lunchStart=" + lunchStart +
-                ", lunchStop=" + lunchStop +
-                ", interval=" + interval +
-                ", gracePeriod=" + gracePeriod +
-                ", dockPenalty=" + dockPenalty +
-                ", lunchDeductionThreshold=" + lunchDeductionThreshold +
-                '}';
+    
+    /**
+     * @return shiftStart
+     */
+    public LocalTime getShiftStart() {
+        return this.shiftStart;
+    }
+    
+    /**
+     * @return shiftStop
+     */
+    public LocalTime getShiftStop() {
+        return this.shiftStop;
+    }
+    
+    /**
+     * @return lunchStart
+     */
+    public LocalTime getLunchStart() {
+        return this.lunchStart;
+    }
+    
+    /**
+     * @return lunchStop
+     */
+    public LocalTime getLunchStop() {
+        return this.lunchStop;
     }
 }
