@@ -1,72 +1,157 @@
 package edu.jsu.mcis.cs310.tas_sp25.dao;
 
 import edu.jsu.mcis.cs310.tas_sp25.Badge;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
+
+/**
+ * It allows for the creation, deletion, and retrieval of badge information.
+ */
 public class BadgeDAO {
 
-    private final Connection connection;
-    
-    // Assume the DAOFactory passes the connection to this DAO.
-    public BadgeDAO(DAOFactory daoFactory) {
-        this.connection = daoFactory.getConnection();
-    }
-    
-    // Existing methods (such as find) are assumed to be present.
-    
+    // Queries
+    private static final String QUERY_INSERT = "INSERT INTO badge (id, description) VALUES (?, ?)";
+    private static final String QUERY_DELETE = "DELETE FROM badge WHERE id = ?";
+    private static final String QUERY_FIND = "SELECT * FROM badge WHERE id = ?";
+
+    private final DAOFactory daoFactory;
+
     /**
-     * Creates a new badge record in the database.
-     * @param badge The Badge object to insert.
-     * @return true if exactly one row was inserted, false otherwise.
+     * Constructs a new <code>BadgeDAO</code> instance with the specified DAOFactory.
+     * @param daoFactory the DAOFactory to be used by this BadgeDAO
+     */
+    BadgeDAO(DAOFactory daoFactory) {
+        this.daoFactory = daoFactory;
+    }
+
+    /**
+     * Finds and retrieves a badge from the database based on the provided badge ID.
+     * @param id the ID of the badge to be retrieved
+     * @return the Badge object retrieved from the database, or null if no badge was found
+     * @throws DAOException if there is an error accessing the database
+     */
+    public Badge find(String id) {
+        Badge badge = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            Connection conn = daoFactory.getConnection();
+            if (conn.isValid(0)) {
+                ps = conn.prepareStatement(QUERY_FIND);
+                ps.setString(1, id);
+                boolean hasResults = ps.execute();
+                if (hasResults) {
+                    rs = ps.getResultSet();
+                    while (rs.next()) {
+                        String description = rs.getString("description");
+                        badge = new Badge(id, description);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DAOException(e.getMessage());
+        } finally {
+            // Close resources
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.getMessage());
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.getMessage());
+                }
+            }
+        }
+        return badge;
+    }
+
+    /**
+     * Creates a new badge in the database with the provided badge information.
+     * @param badge the Badge object containing the information of the badge to be created
+     * @return true if the badge was successfully created, false otherwise
+     * @throws DAOException if there is an error accessing the database
      */
     public boolean create(Badge badge) {
-        String query = "INSERT INTO badge (id, description) VALUES (?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setString(1, badge.getId());
-            ps.setString(2, badge.getDescription());
-            int rowsAffected = ps.executeUpdate();
-            return (rowsAffected == 1);
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        boolean updatedTable = false;
+        try {
+            Connection conn = daoFactory.getConnection();
+            if (conn.isValid(0)) {
+                ps = conn.prepareStatement(QUERY_INSERT, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, badge.getId());
+                ps.setString(2, badge.getDescription());
+                int rowsInserted = ps.executeUpdate();
+                if (rowsInserted == 1) {
+                    updatedTable = true;
+                }
+            }
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new DAOException(e.getMessage());
+        } finally {
+            // Close resources
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.getMessage());
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.getMessage());
+                }
+            }
         }
+        return updatedTable;
     }
-    
+
     /**
-     * Updates an existing badge record in the database.
-     * The badge id remains unchanged.
-     * @param badge The Badge object containing the updated description.
-     * @return true if exactly one row was updated, false otherwise.
+     * Deletes the badge with the specified ID from the database.
+     * @param id the ID of the badge to be deleted
+     * @return true if the badge was successfully deleted, false otherwise
+     * @throws DAOException if there is an error accessing the database
      */
-    public boolean update(Badge badge) {
-        String query = "UPDATE badge SET description = ? WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setString(1, badge.getDescription());
-            ps.setString(2, badge.getId());
-            int rowsAffected = ps.executeUpdate();
-            return (rowsAffected == 1);
+    public boolean delete(String id) {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        boolean updatedTable = false;
+        try {
+            Connection conn = daoFactory.getConnection();
+            if (conn.isValid(0)) {
+                ps = conn.prepareStatement(QUERY_DELETE, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, id);
+                int rowsDeleted = ps.executeUpdate();
+                if (rowsDeleted == 1) {
+                    updatedTable = true;
+                }
+            }
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new DAOException(e.getMessage());
+        } finally {
+            // Close resources
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.getMessage());
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.getMessage());
+                }
+            }
         }
-    }
-    
-    /**
-     * Deletes the badge record with the specified id.
-     * @param badgeId The id of the badge to delete.
-     * @return true if exactly one row was deleted, false otherwise.
-     */
-    public boolean delete(String badgeId) {
-        String query = "DELETE FROM badge WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setString(1, badgeId);
-            int rowsAffected = ps.executeUpdate();
-            return (rowsAffected == 1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        return updatedTable;
     }
 }
