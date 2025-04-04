@@ -39,7 +39,7 @@ public final class DAOFactory {
         return new ShiftDAO(this);
    }
     public PunchDAO getPunchDAO(){
-        return new PunchDAO(this.getConnection(), this);
+        return new PunchDAO(this);
     }
     
     public EmployeeDAO getEmployeeDAO() {

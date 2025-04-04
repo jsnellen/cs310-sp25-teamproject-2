@@ -4,6 +4,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /*
  * Purpose: represent a timestamp when an employee clocks in/out 
@@ -171,17 +173,16 @@ public class Punch {
     
     //StringBuilder for printOriginal
     public String printOriginal(){
-        
+    // Brooklyn you changed this to match format in test file
     StringBuilder s = new StringBuilder();
-    
-    s.append("Punch ID: ").append(id).append(" ");
-    s.append("Terminal ID: ").append(terminalid).append(", ");
-    s.append("Badge: ").append(badge).append(", ");
-    s.append("Punch Type: ").append(punchtype).append(", ");
-    s.append("Original Timestamp: ").append(originaltimestamp).append(")");
-    
+    s.append('#').append(badge.getId()).append(' ');
+    s.append(punchtype).append(": ");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
+    s.append(originaltimestamp.format(formatter).toUpperCase());
     return s.toString();
-    }
+}
+
+
     
     //StringBuilder for printAdjusted
     public String printAdjusted(){
