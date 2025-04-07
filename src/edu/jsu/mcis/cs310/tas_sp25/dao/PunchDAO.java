@@ -72,7 +72,7 @@ public class PunchDAO {
         // Validate terminal ID if employee exists
         if (employee != null) {
             Department employeeDepartment = employee.getDepartment();
-            if (punch.getTerminalid() != employeeDepartment.getTerminalid()) {
+            if (punch.getTerminalid() != employeeDepartment.getTerminalId()) {
                 return 0; // Terminal ID mismatch, reject punch
             }
         }

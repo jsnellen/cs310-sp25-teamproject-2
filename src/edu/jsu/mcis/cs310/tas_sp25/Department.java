@@ -1,44 +1,64 @@
 package edu.jsu.mcis.cs310.tas_sp25;
-//A model class defines the properties and methods of a data structure
-//It should represent the structire of the data / correspond to a table in the database
-//This model class will be used to represent !departments!
+
+/**
+ * Represents a department containing the id, terminal id, and its description
+ * 
+ */
 public class Department {
-    //Variables
-    private int id;
-    private String description;
-    private int terminalid;
-    
-    //Constructor
-    public Department(int id, String description, int terminalid){
+    private  int id, terminalid;
+    private  String description;
+
+    //Constructor for creating a Department object 
+    /**
+     * Constructs a Department object with id, description, and terminal id
+     * @param id The ID of the department
+     * @param description The description of the department
+     * @param terminalid The ID of the terminal associated with the department
+     */
+    public Department(int id, String description, int terminalid) {
         this.id = id;
         this.description = description;
         this.terminalid = terminalid;
     }
     
-    //Getters
-    public int getId() {
+   //Getter Methods
+    /**
+     * Gets the ID of the department.
+     * @return The ID of the department.
+     */
+    public int getId(){
         return id;
     }
-
-    public String getDescription() {
+    
+    /**
+     * Gets the description of the department.
+     * @return The description of the department.
+     */
+    public String getDescription(){
         return description;
     }
-
-    public int getTerminalid() {
+    
+    /**
+     * Gets the terminal ID associated with the department.
+     * @return The terminal ID.
+     */
+    public int getTerminalId(){
         return terminalid;
     }
-
+    
+    /**
+     * Generates a string representation of the Department object, including ID, description, and terminal ID.
+     * @return A string representation of the Department object
+     */
     @Override
-    public String toString() {
-
-        StringBuilder s = new StringBuilder();
+    public String toString(){
+        StringBuilder dpString = new StringBuilder();
         
-        s.append("Department ID: ").append(id).append(" ");
-        s.append("(").append(description).append(", ");
-        s.append("Terminal ID: ").append(terminalid).append(")");
-
-        return s.toString();
-
+        dpString.append('#').append(id).append(' ');
+        dpString.append('(').append(description).append(')');
+        dpString.append(',').append(" Terminal ID: ").append(terminalid);
+        
+        return dpString.toString();
+        
     }
-
 }
