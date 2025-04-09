@@ -13,7 +13,7 @@ import java.time.LocalTime;
 public class Punch {
 
     private Integer id;
-    private Integer terminalid;
+    private int terminalid;
     private Badge badge;
     private EventType punchType;
     private LocalDateTime originalTimestamp;
@@ -35,7 +35,7 @@ public class Punch {
      * @param punchType  The type of punch event (CLOCK_IN, CLOCK_OUT, or TIME_OUT).
      * 
      */
-    public Punch(Integer terminalid, Badge badge, EventType punchType) {
+    public Punch(int terminalid, Badge badge, EventType punchType) {
         this.id = null;
         this.terminalid = terminalid;
         this.badge = badge;
@@ -57,7 +57,7 @@ public class Punch {
      * @param punchType         The type of punch event (CLOCK_IN, CLOCK_OUT, or
      *                          TIME_OUT).
      */
-    public Punch(Integer id, Integer terminalid, Badge badge, LocalDateTime originalTimestamp, EventType punchType) {
+    public Punch(Integer id, int terminalid, Badge badge, LocalDateTime originalTimestamp, EventType punchType) {
         this.id = id;
         this.terminalid = terminalid;
         this.badge = badge;
@@ -184,7 +184,7 @@ public class Punch {
      * 
      * @return the ID of the terminal.
      */
-    public Integer getTerminalid() {
+    public int getTerminalid() {
         return terminalid;
     }
 
