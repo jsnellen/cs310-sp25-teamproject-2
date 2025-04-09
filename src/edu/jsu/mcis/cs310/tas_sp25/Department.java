@@ -42,7 +42,7 @@ public class Department {
      * Gets the terminal ID associated with the department.
      * @return The terminal ID.
      */
-    public int getTerminalId(){
+    public int getTerminalid(){
         return terminalid;
     }
     

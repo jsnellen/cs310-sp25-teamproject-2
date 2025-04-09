@@ -37,7 +37,7 @@ public class PunchDAO {
      * @param id the ID of the Punch
      * @return Punch
      */
-    public Punch find(Integer id) {
+    public Punch find(int id) {
 
         Punch punch = null;
         PreparedStatement ps = null;
@@ -114,9 +114,9 @@ public class PunchDAO {
      * @param punch the punch being created
      * @return punchID
      */
-    public Integer create(Punch punch) {
+    public int create(Punch punch) {
 
-        Integer punchId = 0;
+        int punchId = 0;
         PreparedStatement ps = null;
         ResultSet rs = null;
         
@@ -124,9 +124,9 @@ public class PunchDAO {
         DepartmentDAO departmentdao = daoFactory.getDepartmentDAO();
         Employee emp = employeedao.find(punch.getBadge());
         
-        Integer Empid =emp.getId();
+        int Empid =emp.getId();
         Department department = departmentdao.find(Empid);
-        Integer terminalid = department.getTerminalId();
+        int terminalid = department.getTerminalid();
         
         
         

@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
  */
 public class Employee {   
     // Classes
-    private Integer id;
+    private int id;
     private String firstname, middlename, lastname;
     private LocalDateTime active;
     private Badge badge;
@@ -33,7 +33,7 @@ public class Employee {
      * @param shift The shift of the Employee.
      * @param employeeType The employeeType of the Employee.
      */
-public Employee(Integer id, String firstname, String middlename, String lastname, LocalDateTime active, Badge badge, 
+public Employee(int id, String firstname, String middlename, String lastname, LocalDateTime active, Badge badge, 
             Department department, Shift shift, EmployeeType employeeType) 
     {
         // gathers information for the classes
@@ -54,7 +54,7 @@ public Employee(Integer id, String firstname, String middlename, String lastname
      * Gets the ID of the Employee.
      * @return The ID of the Employee.
      */
-    public Integer getId() {
+    public int getId() {
         return id;
     }
     /**
