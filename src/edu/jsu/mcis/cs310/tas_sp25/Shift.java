@@ -5,126 +5,156 @@
 package edu.jsu.mcis.cs310.tas_sp25;
 
 /**
- *
- * @author brooklynleonard
+ * Represents a shift containing the id, description, start and end of a shift, the round interval, grace period, dock penalty, lunch start and stop, lunch threshold, lunch duration, and shift duration
  */
-
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.Duration;
-import java.util.Map;
+import java.time.LocalTime;
+import java.util.HashMap;
 
 public class Shift {
-    private LocalTime shiftstart;
-    private LocalTime stopTime;
+    private Integer id;
+    private String description;
+    private LocalTime shiftStart;
+    private LocalTime shiftStop;
+    private Integer roundInterval;
+    private Integer gracePeriod;
+    private Integer dockPenalty;
     private LocalTime lunchStart;
     private LocalTime lunchStop;
-    private int totalMinutes;
-    private int lunchMinutes;
-    private String shiftType;
-    private Duration graceperiod;
-    private Duration dockpenalty;
-    private Duration roundinterval;
+    private Integer lunchThreshold;
+    private Duration lunchDuration;
+    private Duration shiftDuration;
 
-
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm[:ss]");
-
-    public Shift(Map<String, String> shiftData) {
-        // Parse times
-        this.shiftstart = LocalTime.parse(shiftData.get("start"), TIME_FORMATTER);
-        this.stopTime = LocalTime.parse(shiftData.get("stop"), TIME_FORMATTER);
-        this.lunchStart = LocalTime.parse(shiftData.get("lunchstart"), TIME_FORMATTER);
-        this.lunchStop = LocalTime.parse(shiftData.get("lunchstop"), TIME_FORMATTER);
-
-        // Calculate total shift minutes
-        this.totalMinutes = (int) Duration.between(shiftstart, stopTime).toMinutes();
-
-        // Calculate lunch minutes
-        this.lunchMinutes = (int) Duration.between(lunchStart, lunchStop).toMinutes();
-
-        // Determine shift type
-        this.shiftType = determineShiftType();
-    }
-    
-    //ensures that the string is in the correct format
-    private LocalTime parseTime(String timeString){
-        if(timeString.length() == 5){
-            timeString += ".00";
-        }
-        return LocalTime.parse(timeString, TIME_FORMATTER);
-    }
-
-    private String determineShiftType() {
-        if (shiftstart.equals(LocalTime.parse("07:00", TIME_FORMATTER)) && lunchStart.equals(LocalTime.parse("11:30", TIME_FORMATTER))) {
-            return "Shift 1 Early Lunch";
-        } else if (shiftstart.equals(LocalTime.parse("07:00", TIME_FORMATTER)) && lunchStart.equals(LocalTime.parse("12:00", TIME_FORMATTER))) {
-            return "Shift 1";
-        } else if (shiftstart.equals(LocalTime.parse("12:00", TIME_FORMATTER))) {
-            return "Shift 2";
-        }
-        return "Unknown Shift";
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
+    /**
+     * Constructor for create a shift Object.
+     * @param shiftInfo a Map String, String for the shift related information.
+     */
+    public Shift(HashMap<String, String> shiftInfo) {
+        // Retrieve values from the map and convert them to their native types
+        this.id = Integer.valueOf((String) shiftInfo.get("id"));
+        this.description = (String) shiftInfo.get("description");
+        this.shiftStart = LocalTime.parse((String) shiftInfo.get("shiftStart"));
+        this.shiftStop = LocalTime.parse((String) shiftInfo.get("shiftStop"));
+        this.roundInterval = Integer.parseInt((String) shiftInfo.get("roundInterval"));
+        this.gracePeriod = Integer.parseInt((String) shiftInfo.get("gracePeriod"));
+        this.dockPenalty = Integer.parseInt((String) shiftInfo.get("dockPenalty"));
+        this.lunchStart = LocalTime.parse((String) shiftInfo.get("lunchStart"));
+        this.lunchStop = LocalTime.parse((String) shiftInfo.get("lunchStop"));
+        this.lunchThreshold = Integer.parseInt((String) shiftInfo.get("lunchThreshold"));
+        this.lunchDuration = Duration.between(lunchStart,lunchStop); 
+        // Check for time duration between differant dates
+        if (Duration.between(shiftStart,shiftStop).isNegative()) {
+            this.shiftDuration = Duration.between(shiftStart,shiftStop).plusDays(1);
+        } else { 
+            this.shiftDuration = Duration.between(shiftStart,shiftStop);
+        } 
         
-        sb.append(shiftType)
-          .append(": ")
-          .append(shiftstart.format(TIME_FORMATTER))
-          .append(" - ")
-          .append(stopTime.format(TIME_FORMATTER))
-          .append(" (")
-          .append(totalMinutes)
-          .append(" minutes); Lunch: ")
-          .append(lunchStart.format(TIME_FORMATTER))
-          .append(" - ")
-          .append(lunchStop.format(TIME_FORMATTER))
-          .append(" (")
-          .append(lunchMinutes)
-          .append(" minutes)");
-        
-        return sb.toString();
     }
 
-    // Getters (if needed)
-    public LocalTime getStartTime() {
-        return shiftstart;
+    // Getters methods
+    /**
+     * Gets the ID of the shift.
+     * @return The ID of the shift.
+     */
+    public Integer getId() {
+        return id;
     }
-
-    public LocalTime getStopTime() {
-        return stopTime;
+    /**
+     * Gets the description of the shift.
+     * @return the description of the shift.
+     */
+    public String getDescription() {
+        return description;
     }
-
+    /**
+     * Gets the time for the start of the shift.
+     * @return Start time for the shift.
+     */
+    public LocalTime getShiftStart() {
+        return shiftStart;
+    }
+    /**
+     * Gets the time for the end of the shift.
+     * @return End time for the shift.
+     */
+    public LocalTime getShiftStop() {
+        return shiftStop;
+    }
+    /**
+     * Gets the round interval for the shift.
+     * @return The round interval for the shift.
+     */
+    public Integer getRoundInterval() {
+        return roundInterval;
+    }
+    /**
+     * Gets the grace period for the shift.
+     * @return The grace period for the shift.
+     */
+    public Integer getGracePeriod() {
+        return gracePeriod;
+    }
+    /**
+     * Gets the dock penalty for the shift.
+     * @return The dock penalty for the shift.
+     */
+    public Integer getDockPenalty() {
+        return dockPenalty;
+    }
+    /**
+     * Gets the time for the start of the lunch period of the shift.
+     * @return Start time for the lunch period.
+     */
     public LocalTime getLunchStart() {
         return lunchStart;
     }
-
+    /**
+     * Gets the time for the end of the lunch period of the shift.
+     * @return End time for the lunch period.
+     */
     public LocalTime getLunchStop() {
         return lunchStop;
     }
-
-    public int getTotalMinutes() {
-        return totalMinutes;
+    /**
+     * Gets the lunch threshold for the shift.
+     * @return the lunch threshold for the shift.
+     */
+    public Integer getLunchThreshold() {
+        return lunchThreshold;
     }
-
-    public int getLunchMinutes() {
-        return lunchMinutes;
+    /**
+     * Gets the lunch duration of the shift.
+     * @return The lunch duration of the shift.
+     */
+    public Duration getLunchDuration() {
+        return lunchDuration;
     }
-
-    public String getShiftType() {
-        return shiftType;
+    /**
+     * Gets the duration of the shift.
+     * @return The duration of the shift.
+     */
+    public Duration getShiftDuration() {
+        return shiftDuration;
     }
-
-    public Duration getGracePeriod() {
-        return graceperiod;
-    }
-
-    public Duration getDockPenalty() {
-        return dockpenalty;
-    }
-
-    public Duration getRoundInterval() {
-        return roundinterval;
+    
+    /**
+     * Generates a string representation of the Shift object, including its description, shift time, and lunch breaks.
+     * @return A string representation of the Shift object.
+     */
+    @Override
+    public String toString() {
+    StringBuilder builder = new StringBuilder();
+    
+    builder.append(description).append(": ")
+           .append(shiftStart).append(" - ")
+           .append(shiftStop).append(" (")
+           .append(shiftDuration.toMinutes()).append(" minutes); Lunch: ")
+           .append(lunchStart).append(" - ")
+           .append(lunchStop).append(" (")
+           .append(lunchDuration.toMinutes()).append(" minutes)");
+      
+    
+    return builder.toString();
+    
     }
 }

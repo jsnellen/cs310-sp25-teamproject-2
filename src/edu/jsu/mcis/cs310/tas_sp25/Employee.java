@@ -1,131 +1,150 @@
 package edu.jsu.mcis.cs310.tas_sp25;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 
 /**
- * Employee class is primarily used for storing and sharing data related to any
- * employee within the database.
+ * Represents a employee containing the id, first name, middle name, last name, 
+ * active time, badge, department, shift, and employee type.
  * 
- * @author Dillon Firman
  */
+public class Employee {   
+    // Classes
+    private Integer id;
+    private String firstname, middlename, lastname;
+    private LocalDateTime active;
+    private Badge badge;
+    private Department department;
+    private Shift shift;
+    private EmployeeType employeeType;
 
-public class Employee {
-
-    private final Integer id;
-    private final String firstName, middleName, lastName;
-    private final LocalDateTime active;
-    private final Shift shift;
-    private final Badge badge;
-    private final Department department;
-    private final EmployeeType type;
-    
-   
-
-    public Employee(HashMap<String, Object> employee) {
-        
-        this.id = (Integer) employee.get("id");
-        this.firstName = (String) employee.get("firstName");
-        this.middleName = (String) employee.get("middleName");
-        this.lastName = (String) employee.get("lastName");
-        this.active = (LocalDateTime) employee.get("active");
-        this.badge = (Badge) employee.get("badge");
-        this.department = (Department) employee.get("department");
-        this.shift = (Shift) employee.get("shift");
-        this.type = (EmployeeType) employee.get("employeeType");
-    }
-
+// Constructor for creating an Employee object with specified parameters.
     /**
-     * @return id
+     * Constructs a Employee object with id, first name, middle name, last name, 
+     * badge, department, shift, employeeType.
+     * @param id The ID of the Employee.
+     * @param firstname The first name of the Employee.
+     * @param middlename The middle name of the Employee.
+     * @param lastname The last name of the Employee.
+     * @param active The active time of the Employee.
+     * @param badge The badge of the Employee.
+     * @param department The department of the Employee.
+     * @param shift The shift of the Employee.
+     * @param employeeType The employeeType of the Employee.
+     */
+public Employee(Integer id, String firstname, String middlename, String lastname, LocalDateTime active, Badge badge, 
+            Department department, Shift shift, EmployeeType employeeType) 
+    {
+        // gathers information for the classes
+        
+        this.id = id;
+        this.firstname = firstname;
+        this.middlename = middlename;
+        this.lastname = lastname;
+        this.active = active;
+        this.badge = badge;
+        this.department = department;
+        this.shift = shift;
+        this.employeeType=employeeType;
+    }
+    
+    //Getter Methods
+    /**
+     * Gets the ID of the Employee.
+     * @return The ID of the Employee.
      */
     public Integer getId() {
-        
         return id;
     }
-    
     /**
-     * @return firstName
+     * Gets the first name of the Employee.
+     * @return The first name of the Employee.
      */
-    public String getFirstName() {
-        
-        return firstName;
+    public String getFirstname() {
+        return firstname;
     }
-    
     /**
-     * @return middleName
+     * Gets the middle name of the Employee.
+     * @return The middle name of the Employee.
      */
-    public String getMiddleName() {
-        
-        return middleName;
+    public String getMiddlename() {
+        return middlename;
     }
-    
     /**
-     * @return lastName
+     * Gets the last name of the Employee.
+     * @return The last name of the Employee.
      */
-    public String getLastName() {
-        
-        return lastName;
+    public String getLastname() {
+        return lastname;
     }
-    
     /**
-     * @return active time
+     * Gets the active time of the Employee.
+     * @return The active time of the Employee.
      */
     public LocalDateTime getActive() {
-        
         return active;
     }
-    
     /**
-     * @return badge
+     * Gets the badge of the Employee.
+     * @return The badge of Employee.
      */
     public Badge getBadge() {
-        
         return badge;
     }
-    
     /**
-     * @return department
+     * Gets the department of the Employee.
+     * @return The department of Employee.
      */
     public Department getDepartment() {
-        
         return department;
     }
-    
     /**
-     * @return shift
+     * Gets the shift of the Employee.
+     * @return The shift of the Employee.
      */
     public Shift getShift() {
-        
         return shift;
     }
-    
     /**
-     * @return type
+     * Gets the employee type of the Employee
+     * @return The employee type of the Employee
      */
-    public EmployeeType getType() {
-        
-        return type;
+    public EmployeeType getEmployeeType() {
+        return employeeType;
     }
     
+  
+    
     /**
-     * Overrides the toString method
-     * @return the employee fields formatted to accommodate a test
+     * Generates a string representation of the Employee object, including ID, first name, middle name, last name, badge, type, department, active status.
+     * @return A string representation of the Employee object.
      */
     @Override
     public String toString() {
         
-        StringBuilder s = new StringBuilder();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-        String formattedActiveDate = active.format(formatter);
-
-        s.append("ID #").append(getId()).append(": ");
-        s.append(getLastName()).append(", ").append(getFirstName()).append(' ').append(getMiddleName());
-        s.append(" (#").append(badge.getId()).append("), Type: ").append(getType());
-        s.append(", Department: ").append(getDepartment().getDescription());
-        s.append(", Active: ").append(formattedActiveDate);
+       StringBuilder employeestring = new StringBuilder();
+       
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         
-        return s.toString();
+         employeestring.append("ID #").append(id)
+                       .append(": ")
+                       .append(lastname)
+                       .append(", ")
+                       .append(firstname)
+                       .append(" ")
+                       .append(middlename)
+                       .append(" (#")
+                       .append(badge.getId())
+                       .append("), Type: ") 
+                       .append(employeeType)
+                       .append(", Department: ")
+                       .append(department.getDescription())
+                       .append(", Active: ")
+                       .append(active.format(format));
+            
+         
+        return employeestring.toString();
         
     }
 }

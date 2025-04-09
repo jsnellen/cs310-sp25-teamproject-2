@@ -15,54 +15,57 @@ import java.sql.SQLException;
  * @author Dillon
  */
 public class DepartmentDAO {
-    
+
     private final DAOFactory daoFactory;
-    
+
     private static final String QUERY_FIND = "SELECT * FROM department WHERE id = ?";
-    //Constructor initializing DAOFactory
+
+    // Constructor initializing DAOFactory
     DepartmentDAO(DAOFactory daoFactory) {
 
         this.daoFactory = daoFactory;
 
     }
+
     // Method to find department by ID
     /**
      * A find method to find Department by ID
+     * 
      * @param id the ID of the department
      * @return department
      */
-    public Department find(int id){
+    public Department find(int id) {
         Department department = null;
-        //Initialize JDBC objects
+        // Initialize JDBC objects
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
-            //Obtain database connection from DAOFactory
+            // Obtain database connection from DAOFactory
             Connection conn = daoFactory.getConnection();
-            
+
             if (conn.isValid(0)) {
 
                 ps = conn.prepareStatement(QUERY_FIND);
                 ps.setInt(1, id);
-                //Execute the query
+                // Execute the query
                 boolean hasresults = ps.execute();
 
                 if (hasresults) {
 
                     rs = ps.getResultSet();
-                    //Iterate through the result set
+                    // Iterate through the result set
                     while (rs.next()) {
                         String description = rs.getString("description");
                         int terminalid = rs.getInt("terminalid");
-                        
-                        //Create a new Department object
+
+                        // Create a new Department object
                         department = new Department(id, description, terminalid);
                     }
                 }
             }
         }
-         
+
         catch (SQLException e) {
 
             throw new DAOException(e.getMessage());
@@ -76,17 +79,17 @@ public class DepartmentDAO {
                     throw new DAOException(e.getMessage());
                 }
             }
-            
+
             if (ps != null) {
-                
+
                 try {
-                    ps.close();   
+                    ps.close();
                 } catch (SQLException e) {
                     throw new DAOException(e.getMessage());
                 }
             }
-        }        
-        return department;//Return the department object;
+        }
+        return department;// Return the department object;
     }
-    
+
 }
