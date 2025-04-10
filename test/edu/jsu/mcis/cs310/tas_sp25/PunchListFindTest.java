@@ -169,4 +169,71 @@ public class PunchListFindTest {
 
     }
 
+    @Test
+    public void testFindPunchList4(){
+        
+        BadgeDAO badgeDAO = daoFactory.getBadgeDAO();
+        PunchDAO punchDAO = daoFactory.getPunchDAO();
+        
+        StringBuilder s1 = new StringBuilder();
+        StringBuilder s2 = new StringBuilder();
+        
+        LocalDate ts = LocalDate.of(2018, Month.AUGUST, 1);
+        
+        Badge b = badgeDAO.find("4E6E296E");
+        
+        ArrayList<Punch> p1 = punchDAO.list(b, ts);
+        
+        for (Punch p : p1) {
+            s1.append(p.printOriginal());
+            s1.append("\n");
+        }
+
+        ArrayList<Punch> p2 = new ArrayList<>();
+        
+        p2.add(punchDAO.find(147));
+        p2.add(punchDAO.find(237));
+
+        for (Punch p : p2) {
+            s2.append(p.printOriginal());
+            s2.append("\n");
+        }
+        
+         assertEquals(s2.toString(), s1.toString());
+
+    }
+    
+    @Test
+    public void testFindPunchList5(){
+        
+        BadgeDAO badgeDAO = daoFactory.getBadgeDAO();
+        PunchDAO punchDAO = daoFactory.getPunchDAO();
+        
+        StringBuilder s1 = new StringBuilder();
+        StringBuilder s2 = new StringBuilder();
+        
+        LocalDate ts = LocalDate.of(2018, Month.AUGUST, 10);
+        
+        Badge b = badgeDAO.find("9E06A774");
+        
+        ArrayList<Punch> p1 = punchDAO.list(b, ts);
+        
+        for (Punch p : p1) {
+            s1.append(p.printOriginal());
+            s1.append("\n");
+        }
+
+        ArrayList<Punch> p2 = new ArrayList<>();
+        
+        p2.add(punchDAO.find(960));
+        p2.add(punchDAO.find(1024));
+
+        for (Punch p : p2) {
+            s2.append(p.printOriginal());
+            s2.append("\n");
+        }
+        
+         assertEquals(s2.toString(), s1.toString());
+
+    }
 }
