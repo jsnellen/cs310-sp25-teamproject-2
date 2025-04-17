@@ -2,11 +2,9 @@ package edu.jsu.mcis.cs310.tas_sp25;
 
 import java.time.LocalDate;
 import java.math.BigDecimal;
-
-/**
- *
- * @author Dillon Firman
- */
+import java.math.RoundingMode;
+import java.time.Duration;
+import java.time.format.DateTimeFormatter;
 
 public class Absenteeism {
 
@@ -14,56 +12,46 @@ public class Absenteeism {
     private final LocalDate localDate;
     private final BigDecimal bigDecimal;
 
-    /**
-     *
-     * @param employee
-     * @param localDate
-     * @param bigDecimal
-     */
     public Absenteeism(Employee employee, LocalDate localDate, BigDecimal bigDecimal) {
         this.employee = employee;
         this.localDate = localDate;
         this.bigDecimal = bigDecimal;
     }
 
-    /**
-     *
-     * @return employee
-     */
     public Employee getEmployee() {
         return employee;
     }
 
-    /**
-     *
-     * @return localDate
-     */
     public LocalDate getLocalDate() {
         return localDate;
     }
 
-    /**
-     *
-     * @return bigDecimal
-     */
     public BigDecimal getBigDecimal() {
         return bigDecimal;
     }
 
     @Override
     public String toString() {
-
         StringBuilder s = new StringBuilder();
         
-        // build string "#28DC3FB8 (Pay Period Starting 09-02-2018): 2.50%"
+        // Build the string in the format: "#<badge> (Pay Period Starting <MM-dd-yyyy>): <percentage%"
+        s.append('#').append(employee.getBadge()).append(" ");  // Add employee badge
+        s.append("(Pay Period Starting ").append(localDate.format(DateTimeFormatter.ofPattern("MM-dd-yyyy"))).append("): ");  // Add formatted pay period date
         
-        s.append('#').append(employee.getBadge()).append(' ');
-        s.append("(Pay Period Starting ").append(getLocalDate()).append("): ");
-        s.append(getBigDecimal());
+        // Format absenteeism rate as percentage with two decimals (rounded)
+        BigDecimal percentage = bigDecimal.setScale(2, RoundingMode.HALF_UP);
+        s.append(percentage.toString()).append("%");
 
         return s.toString();
-
     }
 
+    public static BigDecimal calculateAbsenteeismRate(Shift shift, LocalDate startDate, LocalDate endDate, Duration actualWorkedTime) {
+        Duration scheduledTime = Duration.between(shift.getShiftStart(), shift.getShiftStop());
+        Duration missedTime = scheduledTime.minus(actualWorkedTime);
+
+        return new BigDecimal(missedTime.toMinutes())
+            .divide(new BigDecimal(scheduledTime.toMinutes()), 2, RoundingMode.HALF_UP)
+            .multiply(BigDecimal.valueOf(100));  // Return absenteeism as percentage
+    }
 }
 
