@@ -60,6 +60,7 @@ public class PunchDAO {
 
                     while (rs.next()) {
                          
+
                         LocalDateTime timestamp = rs.getTimestamp("timestamp").toLocalDateTime();
                         int terminalId = rs.getInt("terminalid");
 
@@ -128,9 +129,6 @@ public class PunchDAO {
         Department department = departmentdao.find(Empid);
         int terminalid = department.getTerminalid();
         
-        
-        
-        
         if (Objects.equals(terminalid, punch.getTerminalid())){
 
             try {
@@ -155,7 +153,6 @@ public class PunchDAO {
                         if (rs.next()) {
                             punchId = rs.getInt(1);
 
-                        
                         }
                     }
 
@@ -188,13 +185,11 @@ public class PunchDAO {
     }
         return punchId;
 
-    
-    
     }
     
 
     /**
-     * Returns a list of punches
+     * Returns a list of punches for a specific date
      * @param badge the badge of the Employee
      * @param date the date of the Punch
      * @return list
@@ -243,9 +238,11 @@ public class PunchDAO {
                         // Fetch the first CLOCK_OUT or TIMEOUT punch from the next day
                         while (rs.next()) {
                             
+
                             int id = rs.getInt(1);
                             Punch punch = find(id);
                             
+
                             if (punch.getPunchtype() == EventType.CLOCK_OUT || punch.getPunchtype() == EventType.TIME_OUT) {
                                 list.add(punch);
                                 break;  // Stop after adding the first CLOCK_OUT or TIMEOUT punch
@@ -276,5 +273,25 @@ public class PunchDAO {
         
         return list;
         
-        }
     }
+
+    /**
+     * Returns a list of punches for a range of dates (from `begin` to `end`).
+     * @param badge the badge of the Employee
+     * @param begin the start date of the range
+     * @param end the end date of the range
+     * @return list
+     */
+    public ArrayList<Punch> list(Badge badge, LocalDate begin, LocalDate end) {
+        ArrayList<Punch> list = new ArrayList<>();
+        
+        LocalDate current = begin;
+        while (!current.isAfter(end)) {
+            list.addAll(list(badge, current));
+            current = current.plusDays(1);
+        }
+
+        return list;
+    }
+}
+
