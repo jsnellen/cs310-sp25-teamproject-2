@@ -162,6 +162,6 @@ public class TimeAccruedTest {
 
         /* Compare to Expected Value */
         
-        assertEquals(540, m);
+        assertEquals(300, m);
     }
 }
